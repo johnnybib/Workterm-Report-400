@@ -1,0 +1,501 @@
+%++++++++++++++++++++++++++++++++++++++++
+% Don't modify this section unless you know what you're doing!
+\documentclass[letterpaper,12pt]{article}
+\usepackage{tabularx} % extra features for tabular environment
+\usepackage{amsmath}  % improve math presentation
+\usepackage{amssymb}
+\usepackage{graphicx} % takes care of graphic including machinery
+\usepackage[margin=1in,letterpaper]{geometry} % decreases margins
+\usepackage{cite} % takes care of citations
+\usepackage[final]{hyperref} % adds hyper links inside the generated pdf file
+\usepackage{float}
+\usepackage[toc,page]{appendix}
+\usepackage{listings}
+\usepackage{siunitx}
+\usepackage{pdfpages}
+\usepackage{fancyhdr}
+\usepackage{caption}
+\usepackage{booktabs}
+
+
+
+
+\setlength\parindent{0pt}
+
+
+\hypersetup{
+	colorlinks=true,       % false: boxed links; true: colored links
+	linkcolor=blue,        % color of internal links
+	citecolor=blue,        % color of links to bibliography
+	filecolor=magenta,     % color of file links
+	urlcolor=blue         
+}
+
+\newcommand{\refTemp}{$60^{\circ}\si{C}$}
+\newcommand{\celsius}{^\circ C}
+%++++++++++++++++++++++++++++++++++++++++
+
+\title{Development and Deployment of a Video Codec Monitoring Solution}
+\author{}
+\date{\today}											% Date
+
+\makeatletter
+\let\thetitle\@title
+\let\theauthor\@author
+\let\thedate\@date
+\makeatother
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\theauthor}
+\lhead{\thetitle}
+\cfoot{\thepage}
+
+
+\begin{document}
+
+\begin{titlepage}
+	\centering
+    \vspace*{-1 cm}
+    \includegraphics[scale = 0.5]{UW.jpg}\\	% University Logo
+    \textsc{\Large Department of Mechanical and Mechatronics Engineering}\\[2.0 cm]	
+	\rule{\linewidth}{0.2 mm} \\[0.4 cm]
+	{ \huge \bfseries \thetitle}\\
+	\rule{\linewidth}{0.2 mm} \\[1.5 cm]
+	
+	\begin{minipage}[t]{0.4\textwidth}
+		\begin{flushleft} \large
+			\emph{Author:}\\
+            James Graham-Hu \\
+			\end{flushleft}
+			\end{minipage}~
+			\begin{minipage}[t]{0.4\textwidth}
+			\begin{flushright} \large
+			\emph{Student Number:} \\
+				20555690 \\
+		\end{flushright}
+	\end{minipage}\\[2 cm]
+	Date: 
+	{\large \thedate}\\[2 cm]
+	\vfill
+	
+\end{titlepage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{gobble}
+\thispagestyle{empty}
+%%letter of submittal
+\thedate\\
+
+William Melek, Director\\
+Mechatronics Engineering\\
+University of Waterloo\\
+Waterloo, Ontario\\
+N2L 3G1\\
+
+Dear Professor Melek,\\
+
+This report entitled "Development and Deployment of a Video Codec Monitoring Solution", was prepared as my Work Report 300 for the Department of Mechanical and Mechatronics Engineering at the University of Waterloo for the 3B term. The purpose of this report is to discuss the design of the architecture of a video codec monitoring solution, and the deployment strategy undertaken to deploy the solution to the client site.\\
+
+Hitplay Technologies Inc., located in Toronto Canada, provides audio and video conferencing solutions for its clients. In addition to design and implementation, Hitplay also provides monitoring and support for the devices deployed at a client's site.\\
+
+I was hired at Hitplay as a software developer for my sixth coop term. I was assigned this project by Eric Rauch and worked along with Derek Fei who helped design the software architecture. Work began on the project at the start of July and took two months to develop and deploy the solution to the client's site. My role in the project was to design the software architecture, write the code for the software, and deploy the solution to the client site.\\
+
+
+I would like to thank Eric Rauch and Kevin Rauch for providing support and feedback about the work flow and user experience throughout the project. I would also like to thank Derek Fei for providing valuable insight on the AWS platform. This report was written entirely by  me and has not received any previous academic credit at this or any other institution.\\
+
+Sincerely,\\
+
+James Graham-Hu\\
+ID 20555690\\
+3B Mechatronics Engineering
+
+
+
+\pagebreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{roman}
+\tableofcontents
+\setcounter{page}{1}
+\pagebreak
+\listoffigures
+\pagebreak
+\listoftables
+\pagebreak
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{arabic}
+\section{Summary}
+The objective of this project is to develop and deploy a solution to monitor Cisco video conferencing devices (codecs) and to support a help button feature that a client has requested. The monitoring solution logs state changes from Cisco codecs and displays them on a dashboard in a web application. For the scope of this project, the state changes only need to be logged into a cloud storage solution (S3), as infrastructure is already in place to read the logs from S3 and display them on the dashboard. The help button feature gives users the ability to call for help, or to report an issue with the press of a button on a touch panel connected to a codec. When the button is pressed, an email is sent to an appropriate email address for the selected issue asking for immediate help, or to report the issue. The email address is connected to the client's incident management tool, PagerDuty.\\
+
+A proof of concept (PoC) was developed by a previous employee. The PoC uses Cisco's macro feature to create custom functionality on the codecs using JavaScript code. The macros allow codecs to register status changes and events to a URL. The URL points to a server that parses HTTP POST requests from codecs and logs the state changes into S3. The server is hosted on EC2, a cloud server solution provided by Amazon Web Services (AWS), and is written in Node.js.\\
+
+The finalized solution for this project is comprised of three main components: Macros, the server, and codec code deployment. Similar to the PoC, the macros register status changes and events to the server's URL. The macros also handle the logic required for the PagerDuty UI on the touch panel. The server is written in Node.js and runs on a t2.medium EC2 instance. The server handles requests for the Cisco codecs registered to its URL. The server uses a white list to validate incoming requests. If the codec making the request is in the white list, the request is processed, otherwise the request is ignored. Validated requests are processed in different modules depending on the type of the request. State changes are sent to a monitoring module which parses and logs the request. Every 5 minutes the log of state changes is sent to S3. PagerDuty requests are sent to a PagerDuty module which references the issue the user selected to find the email address to send the help request to. An email is then sent to that email address stating the issue, where the request came from, and the urgency of the request. To deploy the macros to the codecs a deployment application is developed. The deployment application automates the process of macro deployment and simplifies process so that clients can deploy monitoring or PagerDuty themselves.
+
+After development was complete, the solution was deployed to the client's 71 codecs over the month of August. The cost to run the solution is \$42.60 per month.
+\pagebreak
+\section{Introduction}
+\subsection{Audio/Video Background}
+Hitplay is an audio/video company that designs, integrates and supports meeting spaces for its clients. Hitplay's goal is to simplify and standardize the user experience across its client's meeting spaces. The systems Hitplay integrates can range from simple integrations for in-person meetings, to more complex integrations for video conferencing and room control. Video conferencing requires a codec, which is a system that is responsible for inbound and outbound video calls \cite{whatisacodec}, and can control other features such as content sharing, cameras, and microphones.\\
+
+A modern meeting space used for video conferencing generally has a codec, microphones, one or more cameras, HDMI and USB switchers for content sharing, a touchpanel for control, and other devices for functionality the client has requested. A Crestron processor is used to allow these devices to work together and create a seamless experience. The Crestron processor controls each device, sending commands and receiving feedback, so that the room functions as it was intended. For example if a user is in a video call and the user plugs in their laptop, the Crestron processor should detect the laptop and tell the codec to send the laptop screen content to the far end of the call.\\
+
+With an increasing number of devices in the modern meeting space, troubleshooting these rooms is becoming difficult for IT. When a room is malfunctioning, IT has no information on what the problem could potentially be. This was the motivation behind Hitplay's monitoring platform, Care. Care provides real-time data on the state of devices in the meeting space, giving IT the information required to locate and resolve the problem. Since the data is real-time, Care can also provide alerts for problems as soon as they happen so that they can be resolved before the meeting space is needed. To acquire the data, the Crestron processor records all state changes of the devices it is communicating with. Every 5 minutes a log in the form of a .txt file containing these state changes and identifying client information is uploaded to the cloud. The log is parsed and put into a database where the data is checked for anomalies that would create alerts. A dashboard which shows the current state of all the devices in a room reads data from this database. The log can only be sent every 5 minutes due to the technical limitations of making an HTTP request from a Crestron processor. Real-time data streaming locks up the processor if it is handling monitoring for multiple rooms (A Crestron processor can handle up to 10 rooms). 
+
+\subsection{Amazon Web Services Background}
+Amazon Web Services (AWS) provides the services required for Care as well as this project. The main services that are used for Care and this project are S3, EC2, Lambda, and DynamoDB.\\
+
+\textbf{S3:} S3 provides object storage used for storing and retrieving objects from anywhere. S3 is used to store the .txt log files uploaded by the Crestron processors every 5 minutes \cite{s3}.\\
+
+\textbf{EC2:} EC2 provides the cloud computing services needed host a server. It also provides tools for scaling instances to meet demand \cite{ec2}.\\
+
+\textbf{Lambda:} Lambda, similar to EC2, is a cloud computing service; however, Lambda is serverless. This means server time is only used when the code needs to run. During down time when the code is not running the server costs are zero. To run code on Lambda, users define Lambda functions that are called by user defined triggers \cite{lambda}. Lambda is used for the log processor that parses the log files from S3 and puts the data into the database. The Lambda function is triggered when a new log file is uploaded to S3.\\
+
+\textbf{DynamoDB} DynamoDB is a non-relational database. DynamoDB contains the log items table. The log items table contains all the data parsed by the log processor \cite{dynamodb}.
+
+\subsection{Cisco TelePresence Background}
+This project focuses on the Cisco TelePresence series codec. Specifically the SX20, SX80, MX200 G2, MX300 G2, and MX800 models, which all share a similar API and feature set. The codec uses WebEx , Cisco's video conferencing software, for its video conferencing platform, and is controlled using a Cisco Touch 10 touch panel. The codec  provides an API that is used to get feedback about the status of the codec and to send commands to the codec which allows it to easily interface with a Crestron processor. The codec also supports custom functionality and user interfaces. The macro feature allows integrators to upload JavaScript files directly to the codec to create custom functionality. XML files can be uploaded to create custom user interfaces on the Touch 10.
+
+\subsection{Problem Definition}
+One of Hitplay's clients uses Cisco TelePresence codecs in its meeting rooms. It has been found that Crestron processors lock up when monitoring the codecs due to a large amount of data coming from the codecs. It is not feasible to have one Crestron processor handle requests from ten Cisco codecs and other hardware in the meeting rooms.\\
+
+The client has also requested a feature that allows users to request immediate assistance or to report an issue with the touch of a button on the Touch 10 touch panel. The client has provided a list of issues that users can choose from, and emails associated with each issue. A different email address is used depending on the issue selected, and if the request was for immediate assistance or to report an issue. This feature will be referred to as PagerDuty, since the emails are being sent to the client's incident management tool, PagerDuty.
+
+\subsection{Objective}
+The objective of this project is to develop and deploy a solution to monitor the Cisco TelePresence codecs and support the PagerDuty feature. The solution is to be deployed to 71 codecs on floors two to seven of the client's building.
+
+As requested by the client, the workflow for the PagerDuty feature should be as follows:
+\begin{enumerate}
+\item The user presses help button on the Touch 10.
+\item The user selects "Immediate Help", or "Report Issue" depending on the urgency of the issue.
+\item The user selects their issue from a list of issues.
+\item An email is sent to the email associated with the issue selected and urgency of the issue. For example, if the user chooses "Immediate Help", and "Microphone/Speaker Issues", the email should be sent to the Meeting Room Support pager. If the user chooses "Report Issue", "Microphone/Speaker Issues", the email should be sent to the Meeting Room Support email.
+\end{enumerate}
+
+The solution is to be deployed to 71 codecs at the client site by the end of August 2018.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Project Requirements}
+
+\subsection{Constraints}
+The Cisco TelePresence codecs and the nature of the network that the client uses impose several constraints on the design of the solution.
+
+\begin{itemize}
+	\item The API command, HTTP Feedback, allows for the codec to send status changes or events to a specified URL. The PoC makes use of HTTP Feedback to send data to the EC2 instance using HTTP POST requests. The limitation of this feature is that the codec only has 3 "slots" to register URLs to, and each slot can only register 15 expressions for status changes or events. This means the codec can send data to 3 different URLs for 15 different status changes or events per URL.
+	\item For the client, the codecs will be on a network with a firewall. The firewall will let through outbound data from codecs to an external server, but will not allow incoming data to make it to a codec \cite{firewall}. Consequently, any access to the codec would need to be done on the client's local area network (LAN). This means that a site visit is required to upload or edit macros and the custom UI for the codecs. 
+    \item The solution should be ready to deploy by the end of July 2018 and should be fully deployed by the end of August 2018.
+\end{itemize}
+
+\subsection{Criteria}
+The criteria considered for this project are as follows.
+\begin{itemize}
+	\item The number of site visits for any reason should be minimized. Site visits are costly due to travel time required to get to and from site. Ideally, performing maintenance or updating client data should be able to be done remotely.
+	\item Security should be maximized. The client's data should be secure from when it is sent from a codec to when it is stored in the S3 bucket. Someone should not be able to upload dummy data by imitating a codec.
+	\item The number of features that can be installed on a codec should be maximized. These would be features such as PagerDuty and monitoring.
+    \item Monitoring should be implemented with minimal differences from how a Crestron processor performs monitoring, so that the same log processor can be used.
+    \item The cost to run the service should be minimized.
+\end{itemize}
+
+\subsection{Required Components}
+The following components required for monitoring and PagerDuty
+
+\textbf{Server:} A server is required to receive and parse requests from the codecs. The server handles functionality that the codecs cannot perform themselves such as API calls to Amazon services.\\
+
+\textbf{Client/Codec Information Storage:} Client/codec information storage is required to store the identifying information for each codec. The client/codec information should be uploaded along with the state change data for each state change. This information is used to identify which client and which room the codec belongs to as well as other specifics such as the device ID, device name, device type, and room type. Figure \ref{fig:examplelog} is an example of a log file. The client/codec information precedes the state change data.
+\begin{figure}[H]
+\centering \includegraphics[width=1.0\columnwidth]{Example_Log}
+\caption{\label{fig:examplelog}Example log file}
+\end{figure}
+In addition to client/codec information, the client's emails used for PagerDuty also need to be stored.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Initial State of the Project}
+A proof of concept (PoC) was created by a previous employee and is used as a starting point for this project. The PoC had a macro used for monitoring that sends state changes to a server rather than a Crestron processor. The server created the log file and uploaded it to the S3 bucket every 5 minutes. The server was hosted on an EC2 instance and was written in Node.js.
+
+\begin{figure}[H]
+\centering \includegraphics[width=0.8\columnwidth]{PoC_Monitoring_Architecture}
+\caption{\label{fig:PoCArchitecture}Architecture for the Proof of Concept}
+\end{figure}
+
+Figure \ref{fig:PoCArchitecture} shows the architecture for the PoC. The codec sends state changes to the EC2 instance. State changes are logged in a log file. The log file is then sent to the S3 bucket every 5 minutes. Then, in the same way as if a Crestron processor uploaded it, the log file is processed by the Log Processor Lambda function and put into the log items table in DynamoDB.\\
+
+The PoC also had other features such as a "Forgot Pin" that retrieved a user's PIN if they forgot it. Forgot PIN made requests to the server to call an API to retrieve the PIN.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Problems with the PoC} \label{sec:Problems with the PoC}
+There are several problems with the PoC that should be addressed in the final solution to fulfill the constraints and satisfy the criteria.
+
+\begin{itemize}
+	\item The way the PoC sends data from the codec to the server is through query strings. Query strings stored data in the URL that the HTTP POST request is sent to \cite{querystring}. To use a query string, the URL is formatted as follows: https://www.example.com/route?key=value, where key is the name of the data, and value is the value of the data. The PoC registers 17 status expressions to the EC2 server's URL with a query string containing the client data for monitoring. The 17 status expressions occupy two HTTP Feedback slots. The last HTTP Feedback slot is used for forgot pin which registers one event expression to the EC2 server's URL with a query string containing information used to retrieve the PIN. Since all three slots are being used, one slot would need to be unregistered to make room for any other feature that needs to register to a URL with a different query string. This limits the number of features that can be active at a given time to one, given monitoring is always being used.
+    \begin{figure}[H]
+    	\centering \includegraphics[width=0.8\columnwidth]{feedback_slots}
+    	\caption{\label{fig:httpfeedbackslots}HTTP Feedback slots}
+    \end{figure}
+	\item Client information is stored within the macros on the codecs. If this information needs to be edited then a site visit is required  and the information needs to be manually edited for each codec.
+	\item The URL that the PoC is registered to is the EC2 server's URL which depends on the IP address of the EC2 instance. If the instance is terminated and the code is deployed on a new instance, to upgrade the server for example, then the IP address will change. To point the codecs to the new IP address a site visit would be required to edit the macros, as the codecs can only be accessed on the client's LAN.
+	\item Anyone with the URL of the EC2 instance can push data to it given they know the format of the data. This is a security concern, as dummy data can be uploaded to a client's profile by anyone. The only way to stop them would be to change the URL of the EC2 instance or to block their IP address. Changing the URL of the EC2 instance is problematic as stated in the third point of this section, and the attacker can change their IP address if they are blocked.
+    
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Solution Design}
+\subsection{Server}
+EC2 and Lambda are considered for the server hosting service. In order to choose the best solution, the two services are compared based on monthly cost and time required to implement. The cost of EC2 is an hourly rate depending on the size of the instance \cite{ec2}. Without knowing the computational cost of the server it is difficult to calculate the required instance size for EC2 for a given number of incoming requests, so an estimate is given in table \ref{tab:ec2pricing}.
+
+\begin{table}[H]
+	\begin{center}
+		\caption{Pricing for EC2}
+        \label{tab:ec2pricing}
+        \begin{tabular}{l|l|l|l|l}
+        Requests/Second & Required Size & Cores & Memory (GiB) & Cost (\$/month)\\
+        \hline
+        10 & t2.small & 1 & 2 & 16.56\\
+        100 & t2.medium & 2 & 4 & 33.41\\
+        1000 & t2.large & 2 & 8 & 66.82\\
+        10000 & t2.xlarge & 4 & 16 & 133.63\\
+        \end{tabular}
+	\end{center}
+\end{table}
+
+The cost of Lambda is a flat fee per request \cite{lambda}. The first one million requests for the month are free. Each subsequent one million requests costs \$0.20. Equation \ref{eq:pricingLambda} shows the cost per month of Lambda as a function of requests per second.
+\begin{equation}
+\label{eq:pricingLambda}
+Cost (\$/month) = (requests/second\times60\times60\times24\times30-1000000)\times0.0000002
+\end{equation}
+
+Table \ref{tab:lambdapricing} shows the tabulated monthly cost values for 10, 100, 1000, and 10000 requests per second based on equation \ref{eq:pricingLambda}. 
+
+\begin{table}[H]
+	\begin{center}
+		\caption{Pricing for Lambda}
+        \label{tab:lambdapricing}
+        \begin{tabular}{l|l|l|l|l}
+        Requests/Second & Cost (\$/month)\\
+        \hline
+        10 & 4.98\\
+        100 & 51.64\\
+        1000 & 518.20\\
+        10000 & 5183.80\\
+        \end{tabular}
+	\end{center}
+\end{table}
+
+Although Lambda costs less when the number of requests per second is low, it quickly becomes more expensive when compared to EC2 for higher numbers of requests. Therefore, EC2 performs better in terms of cost.\\
+\pagebreak
+
+The second criteria is the time required to implement the service. The cost of developing on EC2 is significantly lower than developing on Lambda since the PoC is already set up to use an EC2 instance. Developing the server code for Lambda would require the code to be rewritten so that it can be run as a Lambda function. Therefore, EC2 performs better in terms of time to implement.\\
+
+EC2 the chosen service to host the server since EC2 performs better than Lambda in terms of cost and time to implement.
+
+\subsection{Client Information Storage}
+The PoC stores client information in the macros themselves. When a state change occurs, the client information is included in the HTTP POST request as a query string. The main issue with this method of client information storage is that editing client information requires a site visit. A proposed solution is to store the client information in a table in DynamoDB. When a request from a codec comes in, the server can use the codec's serial number as the primary key to query the table to retrieve the required information. The codec's serial number is automatically included in the request body for all requests from the codec. Although there will be extra charges from DynamoDB, the overall cost savings will be much greater in the case that the client information needs to be changed. Based on experience, it is estimated  that going to site and updating the information can take up to 3 hours. For a technician at \$30/hour this would cost \$90. For a DynamoDB table with 5 read capacity units (Each RCU can perform up to 7200 reads per hour), and 5 write capacity units (Each WCU can perform up to 3600 writes per hour), the monthly cost is \$2.91 \cite{dynamodb}. This service would need to run for 2.5 years before the DynamoDB costs would exceed the cost to send a technician to site once to edit client information. To further increase savings, after the client information is read from DynamoDB once, it is stored in local memory on the server to be reused the next time a request from that codec comes in. This reduces the number of reads needed to run the service.
+
+\subsection{White List}
+A white list is required on the server to allow requests from white listed codecs to be processed and to ignore anything not on the white list. This prevents dummy data from being uploaded by anyone. The information the white list uses for authentication is an identifier called a UUID (universally unique identifier). The UUID used for the white list is a time based UUID. A time based UUID is a 128 bit long identifier that is derived from the current time \cite{uuiddef}. There is a $1.88\mathrm{e}{-35}\%$ chance of a conflict so uniqueness is virtually guaranteed \cite{uuidunique}\cite{uuidunique2}. The UUID is included in the query string of every post request from the codec. On startup, the server will read a list of pairs of UUIDs and serial numbers from a table in DynamoDB to use as the white list. When a request comes in, the codec's serial number is used as the key to look up that codec's UUID in the white list. If the UUID retrieved from the white list matches the UUID contained in the query string, the request is let through; otherwise the request is ignored. If a UUID is compromised by an attacker it can easily be disabled, and a new one can be issued to the client's codec. 
+
+\subsection{Heartbeat}
+A heartbeat is required to monitor the connection status of the codec. Using polling to check the connection status is impossible since the server cannot communicate to a codec due to the firewall constraint. A heartbeat is used instead. The server will mark a codec as offline in the log file if it does not receive a heartbeat from that codec within a specified time frame.
+A macro is written that sends a heartbeat request from the codec to the server every 5 minutes. When the server receives this request it will mark that codec as online in the log file and store the time it received that heartbeat. Every 5 minutes, the server will go through the list of received heartbeats and check if the current time minus 5 minutes is greater than the received time for each heartbeat. If it is, then it has been more than 5 minutes since the server last received a heartbeat from that codec. In that case the codec will be marked as offline in the log file. Otherwise the codec is marked as online in the log file.
+
+\subsection{HTTP Feedback}
+To overcome the HTTP Feedback slot issue that the PoC had, all HTTP Feedback slots are registered to the same URL, with the query string always being the codec's UUID. This means that multiple features can belong to the same slot. Instead of using the query string to send the user input to the server, a "widgetID" parameter is used. The widgetID is an ID given to a UI element called a widget. This ID can be set dynamically, allowing for information to be encoded into it. Widgets that are buttons will trigger an event when pressed. This event can be registered to the server's URL using HTTP Feedback. The request body that is sent to the server will contain the widgetID, eliminating the need for a query string to send feature specific data to the server. 
+
+\subsection{PagerDuty}
+The PagerDuty feature will be controlled by a macro on the codec. Similar to the Forgot Pin feature that exists in the PoC, the PagerDuty feature will send its requests to the server to be handled. An issue-email mapping that is associated with each client location is stored in DynamoDB (for the same reasons as described for client information storage). This mapping contains a list of the issues the client uses for that specific location (since clients can have multiple office locations), and the emails associated with each issue for "Immediate Help" and "Report Issue". When a user submits a PagerDuty request, the codec sends a request to the server, which then queries DynamoDB for the issue-email mapping for the location the codec is located in if that information is not already stored locally on the server. The server uses Amazon's Simple Email Service (SES) to send an email containing the details for the issue such as which room requested assistance, and the issue name. The email address the email is sent to is determined by checking the issue-email mapping with the issue and urgency specified by the user.
+
+\subsection{Codec Code Deployment}
+Rather than manually deploying macros to each codec, a deployment application is proposed to automate the process. The deployment application will handle deploying the macros, generating UUIDs, and uploading the client/codec information to DynamoDB. Two separate applications will handle deployment for monitoring and PagerDuty. The monitoring deployment application will take a .csv file containing the client information for all the codecs as well as IP addresses for each codec. It will then generate UUIDs for each codec, insert the UUIDs into the macros, upload the macros to the codecs, and write the client/codec information and UUIDs to a Cisco codec info table in DynamoDB. The PagerDuty application will scan the Cisco codec info tableto get the list of codecs with monitoring deployed on them. Within the application, users will be able to create the issue-email mapping by entering issue names, and the emails associated with the issue. When the user is ready to deploy the application will insert the client's issues into the macros, upload the macros to the codecs, and write the issue-email mapping to the location's row in DynamoDB. The advantages of these applications is that they reduces the amount of time required to perform a deployment, and give clients the ability to deploy these features for themselves in the future.
+
+\section{Implementation}
+The implementation is comprised of three major components: Macros, Server, and Codec Code Deployment.
+\subsection{Macro Implementation}
+The macros for monitoring and PagerDuty are coded in JavaScript. The macros use the codec's API commands to provide the required functionality.\\
+
+\textbf{Monitoring:} HTTP Feedback is registered to the server's codec feecback URL for a variety of statuses such as call status and camera status. A query string containing the codec's UUID is included in the URL. When a state change occurs an HTTP POST request is made to the URL, and the data is sent to the server over HTTPS. A separate macro creates a function that runs every 5 minutes that creates a heartbeat message. This message is registered to the server's codec feedback URL using HTTP Feedback.\\
+
+\textbf{PagerDuty} HTTP Feedback is registered to the server's codec feedback URL for user input. A UI file is created and uploaded to the codec that contains buttons for the issue options that the client has requested. When an issue is pressed, the PagerDuty macro checks the issue name and urgency of the issue and creates a prompt with a widgetID containing that information. When the user confirms they would like assistance by pressing "OK" on the prompt, an HTTP POST request is made to the server URL. The body of this request contains a widgetID which the server will recognize as a PagerDuty request and parse to retrieve the user's inputs.
+
+
+\subsection{Server Implementation}
+The server code is written in Node.js. The server is running on a t2.medium EC2 instance which has 2 cores and 8 GiB of memory. This size of server will be enough to handle the 71 codecs at the client site. The server uses express, a web application framework, to listen on a port and receive requests to its codec feedback URL.\\
+
+On startup, the server will read the white list from the Cisco codec info table in DynamoDB. When a request comes in to the codec feedback URL, the server uses the codec's serial number to look up the codec in the white list. If the codec exists in the white list, the server will then compare the UUID received in the query string with the UUID stored under the codec's serial number in the white list. If the UUIDs do not match the request is ignored. If the UUIDs match the server will check the request body to check what type of request it is.\\
+
+If the request is a monitoring request, the server will read the client/codec information from the Cisco codec info table and log the state change. If the client/codec information is already stored locally on the server the read is not required.\\
+
+If the request is not related to monitoring then the server checks the widgetID to check if the request is a PagerDuty request. If the request is a PagerDuty request, the server will read the issue-email mappings, and the client/codec information from DynamoDB. If this information is already stored locally on the server the read is not required. using Simple Email Service (SES), an email containing details for the issue is sent to the email address that the specified issue and urgency map to.\\
+
+After either logging a state change, or sending a PagerDuty email, the server will send the codec a 200 status code indicating the request succeeded \cite{statuscode}. This is required because if the codec does not receive a 200 status code it will attempt the POST request until it receives a 200 status code, or it sends the request 6 times without receiving a 200 status code.
+
+\subsection{Codec Code Deployment Implementation}
+The deployment applications for monitoring and PagerDuty are written in JavaScript, CSS, and HTML. Since the applications share a large amount of code, Bit (bitsrc.io), a component tracking service, is used to manage shared code between the applications. The shared code includes API commands, and DynamoDB commands, and code to upload macros. If more integrations are made in the future, these components can be reused for the deployment applications.\\
+
+The deployment applications follow the Model-View-Controller (MVC) framework \cite{mvc}. The model handles reads and writes to DynamoDB, and calls the Cisco API commands for the deployment. The view renders the user interface, showing data such as codec information, client information, and the client's issue-email mapping. The controller handles the user input, and hands information from the model to the view. When the model retrieves the codec information from DynamoDB, the controller will hand it to the view to render.\\
+
+\textbf{Monitoring Deployment:} The user will first upload a .csv file containing the IP addresses and information for the codecs the user wants to deploy monitoring to. The user should ensure they are connected to the LAN that the codecs are on, so the application can access their APIs over HTTP. When the user begins the deployment process the following steps occur:
+\begin{enumerate}
+	\item The monitoring and heartbeat macros are loaded from their .js files, and escaped for insertion into XML.
+    \item The API commands are loaded. These commands are written in XML.
+    \item Steps 4 to 9 are repeated for each codec.
+    \item A UUID is generated.
+    \item The UUID is inserted into the monitoring macro as the query string in the HTTP Feedback URL.
+    \item An API session is started at the codec's IP address using the codec's credentials as basic authorization.
+    \item Macros are set to "enabled", the macros are uploaded, and the macro runtime is restarted.
+    \item The API session is terminated.
+    \item The codec information and UUID are uploaded to the Cisco codec info table in DynamoDB.
+\end{enumerate}
+
+\textbf{PagerDuty Deployment:} On startup the application will read the IP addresses UUIDs and information for all the codecs that belong to client using the application from the Cisco codec info table in DynamoDB. The user can add or edit issues and emails for PagerDuty. Any changes made in the application are saved to the PagerDuty issue-email mapping element for the specified location in DynamoDB. The user should ensure they are connected to the LAN that the codecs are on, so the application can access their APIs over HTTP. When the user begins the deployment process the following steps occur:
+\begin{enumerate}
+	\item The PagerDuty and feedback registration macros are loaded from their .js files, and escaped for insertion into XML.
+    \item An XML file for the custom UI is generated based on the client's PagerDuty issues.
+    \item The API commands are loaded. These commands are written in XML.
+    \item Steps 5 to 9 are repeated for each codec.
+    \item The Codec's UUID is inserted into the feedback registration macro as the query string in the HTTP Feedback URL.
+    \item An API session is started at the codec's IP address using the codec's credentials as basic authorization.
+    \item Macros are set to "enabled", the macros are uploaded, and the macro runtime is restarted.
+    \item The custom UI XML file is uploaded.
+    \item The API session is terminated.
+    \item PagerDuty is set as enabled for the client's location in DynamoDB.
+\end{enumerate}
+
+The deployment applications run in an framework called electron that enables a JavaScript application to run as a desktop application rather than as a web application. This eliminates the need for a clean user interface design since it will not be client facing, allowing development to be focused on the deployment side of the application. Once the applications are validated they can be put on the Care platform as web applications for clients to use to deploy monitoring and PagerDuty.
+
+\subsection{Solution Architecture}
+Figure \ref{fig:architecture} is the architecture for the proposed solution. Macros operate on the Cisco Codec. The server is hosted on the EC2 instance. The codec code deployment is performed using the Codec Deployment Applications. The architecture diagram shows how each of these three components are connected to each other. 1.x labels represent data flow for monitoring, 2.x labels represent data flow for PagerDuty, 3.x labels represent data flow for codec code deployment, 4.x labels represent data flow for server code deployment, and 5.x labels represent data flow for EC2 monitoring. 
+\begin{figure}[H]
+\centering \includegraphics[width=0.8\columnwidth]{Architecture}
+\caption{\label{fig:architecture}Solution Architecture}
+\end{figure}
+\pagebreak
+
+\textbf{Monitoring}
+
+\textbf{1.1:} The monitoring macro registers status changes to the server's codec feedback URL. State changes are sent to this URL over HTTPS using HTTP POST.
+
+\textbf{1.2:} Route53 routes the request to the CloudFront distribution. Route53 is used to provide a domain name for the codecs to point to, rather than having the codecs point directly to the EC2 server, since the IP address of the EC2 server can change if it is terminated and restarted.
+
+\textbf{1.3:} CloudFront distributes the request to the EC2 instance. CloudFront also holds the SSL certificate so HTTPS can be used to encrypt communication between the codec and the server \cite{https}.
+
+\textbf{1.4:} The whitelist is read from DynamoDB on startup. Codec and client information are read from DynamoDB if not already stored locally.
+
+\textbf{1.5:} Every 5 minutes the log of state changes is written to a .txt file and uploaded to the S3 bucket.
+
+\textbf{1.6:} The log processor is triggered when it sees a new file is uploaded to the S3 bucket. 
+
+\textbf{1.7:} The processed log file is written into the device info table in DynamoDB.\\
+\\
+\textbf{PagerDuty}
+
+\textbf{2.1:} The feedback registration macro registers the user input event to the server's codec feedback URL. User input is sent to this URL over HTTPS using HTTP POST.
+
+\textbf{2.2:} Route53 routes the request to the CloudFront distribution.
+
+\textbf{2.3:} CloudFront distributes the request to the EC2 instance.
+
+\textbf{2.4:} Codec information and the client's issue-email mapping are read from DynamoDB if not already stored locally.
+
+\textbf{2.5:} An email containing details for the issue is sent using SES to the email address that the specified issue and urgency map to.\\
+\\
+\textbf{Codec Code Deployment}
+
+\textbf{3.1:} If deploying monitoring, the user inputs a .csv file containing codec IP addresses, client information, and codec information into the deployment application.
+
+\textbf{3.2:} The required macro JavaScript files and UI XML files are loaded into the application.
+
+\textbf{3.3:} If deploying PagerDuty, the codec info is read from the Cisco codec info table and the issue-email mapping is read from the client location table.
+
+\textbf{3.4:} UUIDs are generated or read from the Cisco codec info table and inserted into Macros. The macros and UI files are then uploaded to the codecs. If deploying PagerDuty, issues are inserted into the Macros and UI files before uploading. 
+
+\textbf{3.5:} If deploying monitoring, the client information, codec information, and UUIDs are uploaded to the Cisco codec info table after the deployment.\\
+\\
+\textbf{Server Code Deployment}
+
+\textbf{4.1:} CodePipeline, a service provided by AWS, listens to the server code GitHub branch.
+
+\textbf{4.2:} When a new change is pushed, CodePipeline starts a deployment using CodeDeploy, another AWS service.
+
+\textbf{4.3:} CodeDeploy pulls the server code from the GitHub repo.
+
+\textbf{4.4:} CodeDeploy copies the server code to S3 as a backup.
+
+\textbf{4.5:} CodeDeploy deploys the server code to the EC2 instance. On the EC2 instance, PM2, a process manager, is used to detect changes in the server code and restart the server with the new code.\\
+\\
+\textbf{EC2 Monitoring}
+
+\textbf{5.1:} CloudWatch monitors a matrix of EC2 instances and shows real-time info on a dashboard. Currently the matrix only contains one EC2 instance, but in the future more EC2 instances will be needed to handle higher numbers of requests.
+
+\textbf{5.2:} When a CloudWatch alarm triggers, Simple Notification Service (SNS) is used to notify developers via email.
+
+
+
+\section{Results}
+\subsection{Deployment}
+Using the deployment applications, monitoring and PagerDuty were deployed to all 71 codecs over the month of August. Initially the solution was deployed on two codecs for testing. After verifying the solution did not affect any systems already in place, deployment was rolled out to two floors each week. The client site has seven floors, with floors two to seven containing codecs. The deployment was executed starting with floors most lenient towards errors or bugs and ending with floors most strict towards errors or bugs. Deployment started with the 4th and 3rd floors, then 5th and 6th floors, and ended with the 2nd and 7th floors. After deployment on the 4th and 3rd floors, most of the deployment application and server bugs were found and fixed.
+
+\subsection{EC2 Performance}
+The t2.medium EC2 instance is handling the requests from the 71 codecs with an average CPU and RAM utilization of 0.5\% and 106 MB respectively. On average the server receives on average 100 requests per minute, or 1.67 requests per second. With 71 codecs, this means that each codec makes on average 1.4 requests per minute. The previous estimate that a t2.medium instance could handle up to 100 codecs was on the conservative side, as the CPU and RAM utilization are well below critical levels at 1.67 requests per second.
+
+\subsection{Monthly Costs}
+Route53 costs \$0.400 per million queries. With an average of 1.67 requests per second, Route53 costs \$1.73 per month. CloudFront costs \$0.0105 per 10000 HTTPS requests. With an average of 1.67 requests per second, CloudFront costs \$4.55 per month. Adding these costs to the cost of a t2.medium EC2 instance at \$33.41 per month and the cost of the Cisco codec info DynamoDB table at \$2.91 per month, the cost of running the entire solution is \$42.60 per month. This does not include the cost of running the Lambda function for the log processor, and the S3 bucket since they are already used for monitoring using the traditional Crestron method. 
+
+\section{Conclusion}
+The objective of this project was to develop and deploy a solution to monitor the Cisco TelePresence codecs and support the PagerDuty feature that the client requested. The solution uses macros on the Cisco codecs to handle the logic required for PagerDuty, and to register state changes to the EC2 server's URL. When a state change occurs, or when the user submits a request for assistance using PagerDuty, an HTTP POST request is made to the EC2 server's URL. The EC2 server is used to process the requests from the codecs, logging state changes and sending PagerDuty emails based on the type of request received. The server also utilizes a white list to accept or ignore incoming requests based on a UUID included in the query string of the request. To deploy the macros for monitoring and PagerDuty to the Cisco codecs, two deployment applications are used. The monitoring deployment application takes a .csv file containing codec IP addresses and information as input from the user, deploys monitoring to the codec's listed in the .csv file, and writes the information to the Cisco codec info table in DynamoDB. The PagerDuty deployment application reads the information from the Cisco codec info table, allows the user to add to or edit the issue-email mapping, and deploys PagerDuty to the codec's read from the Cisco codec info table. The solution was successfully deployed to all 71 of the client's codecs over the month of August. The cost of the solution is \$42.60 per month. The solution receives and average of 1.67 requests per second from the codecs.
+
+\section{Recommendations}
+In the future, more integrations such as forgot PIN can be developed for the Cisco codecs. A process similar to how PagerDuty is implemented can be used, making development for new integrations simpler. Deployment applications for new integrations are also simple develop using the Bit components that were developed for monitoring and PagerDuty deployment. For the deployment applications to be production ready they will need to rewritten as web applications and put on the Hitplay Care website. The library used for the user interface on Hitplay Care is called React. While migrating the deployment applications to web applications, they should also be rewritten in React to match the code stack and user interface of the rest of Hitplay Care.
+\pagebreak
+
+\begin{thebibliography}{99}
+\bibitem{whatisacodec}
+"What is a CODEC? And why is it an important component of videoconferencing?", \textit{Jwhornvideoconference.com}, 2018. [Online]. Available: http://www.jwhornvideoconference.com/what-is-a-codec-and-why-is-it-an-important-component-of-videoconferencing. [Accessed: 16- Aug- 2018].
+
+\bibitem{s3}
+"Cloud Object Storage", \textit{Amazon Web Services, Inc.}, 2018. [Online]. Available: https://aws.amazon.com/s3/. [Accessed: 16- Aug- 2018].
+
+\bibitem{ec2}
+"Amazon EC2", \textit{Amazon Web Services, Inc.}, 2018. [Online]. Available: https://aws.amazon.com/ec2. [Accessed: 16- Aug- 2018].
+
+\bibitem{lambda}
+"AWS Lambda – Serverless Compute", \textit{Amazon Web Services, Inc.}, 2018. [Online]. Available: https://aws.amazon.com/lambda/. [Accessed: 16- Aug- 2018].
+
+\bibitem{dynamodb}
+"Amazon DynamoDB", \textit{Amazon Web Services, Inc.}, 2018. [Online]. Available: https://aws.amazon.com/dynamodb/. [Accessed: 16- Aug- 2018].
+
+\bibitem{firewall}
+"What is firewall? - Definition from WhatIs.com", \textit{SearchSecurity}, 2018. [Online]. Available: https://searchsecurity.techtarget.com/definition/firewall. [Accessed: 16- Aug- 2018].
+
+\bibitem{querystring}
+"What is a Query String?", \textit{Techopedia.com}, 2018. [Online]. Available: https://www.techopedia.com/definition/1228/query-string. [Accessed: 16- Aug- 2018].
+
+\bibitem{uuiddef}
+P. Leach, M. Mealling and R. Salz, "RFC 4122 - A Universally Unique IDentifier (UUID) URN Namespace", \textit{Tools.ietf.org}, 2005. [Online]. Available: https://tools.ietf.org/html/rfc4122\#section-4.2. [Accessed: 16- Aug- 2018].
+
+\bibitem{uuidunique}
+"Are UUIDs really unique?", \textit{Towards Data Science}, 2018. [Online]. Available: https://towardsdatascience.com/are-uuids-really-unique-57eb80fc2a87. [Accessed: 16- Aug- 2018].
+
+\bibitem{uuidunique2}
+"Advanced", \textit{2database.com}, 2018. [Online]. Available: http://www.h2database.com/html/advanced.html\#uuid. [Accessed: 16- Aug- 2018].
+
+\bibitem{statuscode}
+"HTTP/1.1: Status Code Definitions", \textit{W3.org}, 2018. [Online]. Available: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html. [Accessed: 16- Aug- 2018].
+
+\bibitem{mvc}
+"MVC Framework Introduction", \textit{www.tutorialspoint.com}, 2018. [Online]. Available: https://www.tutorialspoint.com/mvc\_framework/mvc\_framework\_introduction.htm. [Accessed: 16- Aug- 2018].
+
+\bibitem{https}
+"What is HTTPS?", \textit{Techopedia.com}, 2018. [Online]. Available: https://www.techopedia.com/definition/5361/hypertext-transport-protocol-secure-https. [Accessed: 16- Aug- 2018].
+
+
+
+\end{thebibliography}
+
+\begin{appendices}
+\section{Appendix}
+\end{appendices}
+
+
+\end{document}
