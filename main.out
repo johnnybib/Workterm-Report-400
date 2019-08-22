@@ -1,38 +1,37 @@
 \BOOKMARK [1][-]{section.1}{Summary}{}% 1
 \BOOKMARK [1][-]{section.2}{Introduction}{}% 2
-\BOOKMARK [2][-]{subsection.2.1}{Automatic Levelling Wrist Background}{section.2}% 3
-\BOOKMARK [3][-]{subsubsection.2.1.1}{Automatic Levelling Method}{subsection.2.1}% 4
-\BOOKMARK [2][-]{subsection.2.2}{Reinforcement Learning Background}{section.2}% 5
-\BOOKMARK [3][-]{subsubsection.2.2.1}{Q-Learning}{subsection.2.2}% 6
-\BOOKMARK [3][-]{subsubsection.2.2.2}{Function Approximation}{subsection.2.2}% 7
-\BOOKMARK [2][-]{subsection.2.3}{Neural Network Background}{section.2}% 8
-\BOOKMARK [3][-]{subsubsection.2.3.1}{Backpropagation}{subsection.2.3}% 9
-\BOOKMARK [3][-]{subsubsection.2.3.2}{Levenberg-Marquardt Algorithm}{subsection.2.3}% 10
-\BOOKMARK [1][-]{section.3}{Project Outline}{}% 11
-\BOOKMARK [2][-]{subsection.3.1}{Problem Definition}{section.3}% 12
-\BOOKMARK [2][-]{subsection.3.2}{Objective}{section.3}% 13
-\BOOKMARK [2][-]{subsection.3.3}{Constraints}{section.3}% 14
-\BOOKMARK [2][-]{subsection.3.4}{Criteria}{section.3}% 15
-\BOOKMARK [1][-]{section.4}{Proposed Solutions}{}% 16
-\BOOKMARK [2][-]{subsection.4.1}{Reinforcement Learning Methods}{section.4}% 17
-\BOOKMARK [2][-]{subsection.4.2}{Neural Network Methods}{section.4}% 18
-\BOOKMARK [1][-]{section.5}{Solution Evaluation}{}% 19
-\BOOKMARK [2][-]{subsection.5.1}{Q-learning - Tabular}{section.5}% 20
-\BOOKMARK [2][-]{subsection.5.2}{Q-learning - Function Approximation}{section.5}% 21
-\BOOKMARK [2][-]{subsection.5.3}{Neural Network Controller}{section.5}% 22
-\BOOKMARK [2][-]{subsection.5.4}{PID Auto-Tuning - Trained with Model, using Levenberg-Marquardt}{section.5}% 23
-\BOOKMARK [2][-]{subsection.5.5}{PID Auto-Tuning - Trained Model-Free, using Levenberg-Marquardt}{section.5}% 24
-\BOOKMARK [2][-]{subsection.5.6}{PID Auto-Tuning - Trained Model-Free, using backpropagation}{section.5}% 25
-\BOOKMARK [2][-]{subsection.5.7}{Chosen Solution}{section.5}% 26
-\BOOKMARK [1][-]{section.6}{PID Auto-Tuning Implementation}{}% 27
-\BOOKMARK [2][-]{subsection.6.1}{Servo Transfer Function}{section.6}% 28
-\BOOKMARK [2][-]{subsection.6.2}{Single DoF Simulation}{section.6}% 29
-\BOOKMARK [2][-]{subsection.6.3}{Neural Network Structure}{section.6}% 30
-\BOOKMARK [2][-]{subsection.6.4}{Levenberg-Marquardt Algorithm Implementation}{section.6}% 31
-\BOOKMARK [2][-]{subsection.6.5}{Numerical Jacobian Calculation}{section.6}% 32
-\BOOKMARK [2][-]{subsection.6.6}{Amplitude Modulated Pseudo-Random Binary Signal \(APRBS\) Generation}{section.6}% 33
-\BOOKMARK [1][-]{section.7}{Results}{}% 34
-\BOOKMARK [1][-]{section.8}{Conclusion}{}% 35
-\BOOKMARK [1][-]{section.9}{Recommendations}{}% 36
-\BOOKMARK [1][-]{section*.7}{Appendices}{}% 37
-\BOOKMARK [1][-]{Appendix.1.A}{Appendix}{}% 38
+\BOOKMARK [2][-]{subsection.2.1}{Problem Definition}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Objective}{section.2}% 4
+\BOOKMARK [1][-]{section.3}{Background}{}% 5
+\BOOKMARK [2][-]{subsection.3.1}{Automatic Levelling Wrist Background}{section.3}% 6
+\BOOKMARK [3][-]{subsubsection.3.1.1}{Automatic Levelling Method}{subsection.3.1}% 7
+\BOOKMARK [2][-]{subsection.3.2}{Reinforcement Learning Background}{section.3}% 8
+\BOOKMARK [3][-]{subsubsection.3.2.1}{Q-Learning}{subsection.3.2}% 9
+\BOOKMARK [3][-]{subsubsection.3.2.2}{Function Approximation}{subsection.3.2}% 10
+\BOOKMARK [2][-]{subsection.3.3}{Neural Network Background}{section.3}% 11
+\BOOKMARK [3][-]{subsubsection.3.3.1}{Backpropagation}{subsection.3.3}% 12
+\BOOKMARK [3][-]{subsubsection.3.3.2}{Levenberg-Marquardt Algorithm}{subsection.3.3}% 13
+\BOOKMARK [1][-]{section.4}{Proposed Solutions}{}% 14
+\BOOKMARK [2][-]{subsection.4.1}{Criteria and Constraints}{section.4}% 15
+\BOOKMARK [2][-]{subsection.4.2}{Reinforcement Learning Methods}{section.4}% 16
+\BOOKMARK [2][-]{subsection.4.3}{Neural Network Methods}{section.4}% 17
+\BOOKMARK [1][-]{section.5}{Solution Evaluation}{}% 18
+\BOOKMARK [2][-]{subsection.5.1}{Q-learning - Tabular}{section.5}% 19
+\BOOKMARK [2][-]{subsection.5.2}{Q-learning - Function Approximation}{section.5}% 20
+\BOOKMARK [2][-]{subsection.5.3}{Neural Network Controller}{section.5}% 21
+\BOOKMARK [2][-]{subsection.5.4}{PID Auto-Tuning - Trained with Model, using Levenberg-Marquardt}{section.5}% 22
+\BOOKMARK [2][-]{subsection.5.5}{PID Auto-Tuning - Trained Model-Free, using Levenberg-Marquardt}{section.5}% 23
+\BOOKMARK [2][-]{subsection.5.6}{PID Auto-Tuning - Trained Model-Free, using backpropagation}{section.5}% 24
+\BOOKMARK [2][-]{subsection.5.7}{Chosen Solution}{section.5}% 25
+\BOOKMARK [1][-]{section.6}{PID Auto-Tuning Implementation}{}% 26
+\BOOKMARK [2][-]{subsection.6.1}{Servo Transfer Function}{section.6}% 27
+\BOOKMARK [2][-]{subsection.6.2}{Single DOF Simulation}{section.6}% 28
+\BOOKMARK [2][-]{subsection.6.3}{Neural Network Structure}{section.6}% 29
+\BOOKMARK [2][-]{subsection.6.4}{Levenberg-Marquardt Algorithm Implementation}{section.6}% 30
+\BOOKMARK [2][-]{subsection.6.5}{Numerical Jacobian Calculation}{section.6}% 31
+\BOOKMARK [2][-]{subsection.6.6}{Amplitude Modulated Pseudo-Random Binary Signal \(APRBS\) Generation}{section.6}% 32
+\BOOKMARK [1][-]{section.7}{Results}{}% 33
+\BOOKMARK [1][-]{section.8}{Conclusion}{}% 34
+\BOOKMARK [1][-]{section.9}{Recommendations}{}% 35
+\BOOKMARK [1][-]{section*.11}{Appendices}{}% 36
+\BOOKMARK [1][-]{Appendix.1.A}{Appendix}{}% 37

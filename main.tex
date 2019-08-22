@@ -18,8 +18,7 @@
 \usepackage{booktabs}
 
 
-
-
+\setlength{\parskip}{1em}
 \setlength\parindent{0pt}
 
 
@@ -31,8 +30,8 @@
 	urlcolor=blue
 }
 
-\newcommand{\refTemp}{$60^{\circ}\si{C}$}
-\newcommand{\celsius}{^\circ C}
+
+\newcommand{\degrees}{^\circ}
 %++++++++++++++++++++++++++++++++++++++++
 
 \title{Title}
@@ -116,7 +115,7 @@ ID 20555690\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \pagenumbering{roman}
 \tableofcontents
-\setcounter{page}{1}
+% \setcounter{page}{1}
 \pagebreak
 \listoffigures
 \pagebreak
@@ -130,19 +129,50 @@ ID 20555690\\
 Summary
 \pagebreak
 \section{Introduction}
+\subsection{Problem Definition}
+Amii needs demos that demonstrate the capabilities of ml
+Amii needs a hardware demo specifically
+The automatic levelling wrist provides is a good candidate for improvement using ml
 
+
+\subsection{Objective}
+Design an ML system to improve the performance of the automatic levelling wrist
+
+
+\section{Background}
 \subsection{Automatic Levelling Wrist Background}
-Powered wrist movement is rare in commercial systems, and many powered protheses have only one degree of freedom (DoF), usually rotation \cite{n.m.bajaj}. These limitations in ease of wrist movement in many upper limb prostheses force people with major upper limb loss to use compensatory movements \cite{s.l.carey}. Compensation occurs in trunk, shoulder, and elbow movements has been associated with causing musculoskeletal pain in the neck, upper back, shoulder, and remaining arm \cite{k.ostlie}.
+Powered wrist movement is rare in commercial systems, and many powered protheses have only one degree of freedom (DOF), usually rotation \cite{n.m.bajaj}. These limitations in ease of wrist movement in many upper limb prostheses force people with major upper limb loss to use compensatory movements \cite{s.l.carey}. Compensation occurs with trunk, shoulder, and elbow movements, and has been associated with causing musculoskeletal pain in the neck, upper back, shoulder, and remaining arm \cite{k.ostlie}.
 
-A two DoF automatic levelling wrist was developed by Dylan J. A. Brenneis in 2019 that addresses the issues with ease of wrist movement in wrist prosthetics \cite{d.j.a.brenneis}. Why it is useful. Uses a PID controller with manually tuned gains to level the wrist to make tasks easier [Dylan's thesis]. Users reported reliability issues [Dylan's thesis]. A more reliable control method should be implemented to improve the user experience.
+A two DOF automatic levelling wrist was developed by Dylan J. A. Brenneis in 2019 that addresses the issues with ease of wrist movement in wrist prosthetics \cite{d.j.a.brenneis}. The two DOF automatic levelling wrist provides two degrees of freedom, rotation and flexion of the wrist. The user has the ability to switch between controlling the position of the flexion, or letting it automatically level itself to maintain its angle with the ground (see figure \ref{fig:auto_levelling}). The rotation of the wrist is always automatically leveled to be flat with the ground. These features are shown to reduce compensatory movements in vertically-oriented tasks. However, the current implementation of the automatic levelling wrist is reported as unreliable and unintuitive in user tests \cite{d.j.a.brenneis}. Possible reasons for a feeling of unreliability from users could be a result of slow response time, oscillations, and poor disturbance rejection in the automatic levelling system.
+
+\begin{figure}[H]
+\centering \includegraphics[width=0.8\columnwidth]{auto_levelling.png}
+\caption{\label{fig:auto_levelling}Automatic levelling of the flexion. The angle, $\theta$, of the flexion servo is constant with the ground as the arm moves (represented by the green dashed line) \cite{d.j.a.brenneis}.}
+\end{figure}
+
+Figure \ref{fig:slw_diagram} shows the design of the automatic levelling wrist. It should be noted that the automatic levelling wrist is designed as a bypass protheses so that an able-bodied person is able to use it. A higher statistical power is able to be achieved in a more time efficient way by running trials with able-bodied persons, because of limitations in participant availability when running trials with participants affected by amputation \cite{d.j.a.brenneis}.
+
+\begin{figure}[H]
+\centering \includegraphics[width=0.8\columnwidth]{slw_diagram.png}
+\caption{\label{fig:slw_diagram}Diagram of the automatic levelling wrist bypass protheses \cite{d.j.a.brenneis}.}
+\end{figure}
+
 \subsubsection{Automatic Levelling Method}
-Angle definition
-Angle correction
-PID controller
+The wrist is automatically leveled using an Adafruit 9-DOF absolute orientation IMU fusion breakout (BNO055) attached to the base of the gripper, as seen in figure \ref{fig:slw_diagram}, and two independent PID controllers, one for the rotation servo and one for the flexion servo. The gravity vector from the IMU is used to calculate the current angle of rotation and flexion. The error between the calculated angle and the setpoint is fed into the PID controller to generate a control signal for the servo. The setpoint for the rotation servo is always set to $180\degrees$ while the setpoint for the flexion servo is set to where the user last moved it to before switching to automatic levelling. Figure \ref{fig:angles} shows the definitions for the coordinate system, the angle of rotation, $\phi$, and the angle of flexion, $\theta$.
 
+\begin{figure}[H]
+\centering \includegraphics[width=0.8\columnwidth]{angles.png}
+\caption{\label{fig:angles}Coordinate system and angles, $\phi$ and $\theta$. The projections of the IMU gravity vector (GV) can be used to calculate $\phi$ and $\theta$ \cite{d.j.a.brenneis}.}
+\end{figure}
 
+$\phi$ is defined as the angle between the negative y-axis and the projection of the gravity vector in the x-y plane. $\theta$ is defined as the angle between the positive z-axis and the projection of the gravity vector projected in the y-z plane.
 
+Figure \ref{fig:servo_system} shows the block diagram for one servo in the automatic levelling wrist. A simple PID control loop controls the position of the servo. The servo position is summed with a disturbance and fed through the IMU to acquire either $\phi$ or $\theta$. The block diagram for the rotation and flexion servos are the same other than the $K_p$, $K_i$, and $K_d$ gain values for the PID controllers, the IMU function, and the value of the disturbance, $d(t)$. The disturbance is considered as the angle of the user's wrist with respect to a fixed coordinate system that is coincident with the user's wrist when it is completely level with the ground. Note that in the actual implementation of the control loop, the disturbance and servo position aren't directly used. Rather, they are implicitly included when the IMU measures the gravity vector since the gravity vector changes based on the disturbance and servo positions.
 
+\begin{figure}[H]
+\centering \includegraphics[width=0.8\columnwidth]{servo_system.png}
+\caption{\label{fig:servo_system}Block diagram of the control loop for one servo.}
+\end{figure}
 
 \subsection{Reinforcement Learning Background}
 Agent-Environment-Reward diagram
@@ -160,25 +190,15 @@ Chain rule
 Show equation
 
 
-\section{Project Outline}
-\subsection{Problem Definition}
-Amii needs demos that demonstrate the capabilities of ml
-Amii needs a hardware demo specifically
-The automatic levelling wrist provides is a good candidate for improvement using ml
 
-
-\subsection{Objective}
-Design an ML system to improve the performance of the automatic levelling wrist
-
-\subsection{Constraints}
-
+\section{Proposed Solutions}
+\subsection{Criteria and Constraints}
 \begin{itemize}
 		\item The solution must improve the performance of the automatic levelling wrist.
     \item The solution must implement machine learning in some way.
 
 \end{itemize}
 
-\subsection{Criteria}
 The following criteria considered in choosing an appropriate solution are chosen such that the automatic levelling wrist reliably improves the user's ability to use the prosthetic.
 \begin{itemize}
     \item The solution should minimize steady state error.
@@ -188,7 +208,6 @@ The following criteria considered in choosing an appropriate solution are chosen
 \end{itemize}
 Due to the nature of the problem, training time and data are difficult to acquire. Without a sophisticated simulation, data and training can only be collected and run in real time. Therefore, the solution should require minimal training time and data.
 
-\section{Proposed Solutions}
 \subsection{Reinforcement Learning Methods}
 Tabular Q-learning
 Q-learning with function approximation
@@ -209,7 +228,7 @@ Not enough data to train the neural network, difficult to visit all states, no s
 Deadly triad (bootstrapping, function approximation and off-policy learning) - not guaranteed to converge
 
 \subsection{Neural Network Controller}
-Not enough data to generalize, better to make use of PID controller
+Not enough data to generalize, better to make use of PID controller (domain knowledge)
 \subsection{PID Auto-Tuning - Trained with Model, using Levenberg-Marquardt}
 Requires a simulation for the servo, however the level of sophistication for the simulation does not need to be extremely high as in an RL setting. Uses a PID controller (so not starting from scratch) which makes it more reliable, as the PID controller on its own will achieve the objective of automatic levelling to a certain level. Therefore a simple simulation can be a starting point.
 Quick training for the neural network, as a simulation can tune the neural network many times faster than real time.
@@ -225,7 +244,7 @@ The chosen solution was PID auto-tuning trained using a model, using the Levenbe
 Required components: a transfer function or ode for the servo, a simulation, a neural network, a numerical implementation of the levenberg marquardt algorithm, a numerical jacobian calculator, an APRBS generator, a neural network implemented in C\#
 \subsection{Servo Transfer Function}
 
-\subsection{Single DoF Simulation}
+\subsection{Single DOF Simulation}
 Best parameters for simulation
 
 \subsection{Neural Network Structure}
@@ -270,28 +289,30 @@ Sample equation
 \section{Conclusion}
 
 \section{Recommendations}
-Better Simulation (2 DoF, better approximation of moment of inertia for different servo positions, take torque due to gravity into account)
+Better Simulation (2 DOF, better approximation of moment of inertia for different servo positions, take torque due to gravity into account)
 
 
 \pagebreak
 
 \begin{thebibliography}{99}
+\bibitem{n.m.bajaj}
+N. M. Bajaj, A. J. Spiers, and A. M. Dollar, “State of the art in prosthetic wrists: Commercial and research devices”, in \textit{2015 IEEE International Conference on Rehabilitation Robotics
+(ICORR)}, Aug. 2015, pp. 331–338.
+
 \bibitem{s.l.carey}
 S. L. Carey, M. J. Highsmith, M. E. Maitland, and R. V. Dubey, “Compensatory movements
-of transradial prosthesis users during common tasks”, Clinical Biomechanics, vol. 23, no. 9,
+of transradial prosthesis users during common tasks”, \textit{Clinical Biomechanics}, vol. 23, no. 9,
 pp. 1128 –1135, 2008.
 
-\bibitem{n.m.bajaj}
-N. M. Bajaj, A. J. Spiers, and A. M. Dollar, “State of the art in prosthetic wrists: Commercial and research devices”, in 2015 IEEE International Conference on Rehabilitation Robotics
-(ICORR), Aug. 2015, pp. 331–338.
+
 
 \bibitem{k.ostlie}
 K. Østlie, R. J. Franklin, O. H. Skjeldal, A. Skrondal, and P. Magnus, “Musculoskeletal pain
-and overuse syndromes in adult acquired major upper-limb amputees”, Archives of Physical
-Medicine and Rehabilitation, vol. 92, no. 12, pp. 1967 –1973, 2011.
+and overuse syndromes in adult acquired major upper-limb amputees”, \textit{Archives of Physical
+Medicine and Rehabilitation}, vol. 92, no. 12, pp. 1967 –1973, 2011.
 
-\bibtem{d.j.a.brenneis}
-file:///C:/Users/James/Documents/Bypass_Prothesis/Brenneis_Dylan_JA_201903_MSc.pdf
+\bibitem{d.j.a.brenneis}
+D. J. A. Brenneis, "Automatic Levelling of a Prosthetic Wrist", \textit{University of Alberta}, 2019.
 % \bibitem{whatisacodec}
 % "What is a CODEC? And why is it an important component of videoconferencing?", \textit{Jwhornvideoconference.com}, 2018. [Online]. Available: http://www.jwhornvideoconference.com/what-is-a-codec-and-why-is-it-an-important-component-of-videoconferencing. [Accessed: 16- Aug- 2018].
 %

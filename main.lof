@@ -1,1 +1,5 @@
-\contentsline {figure}{\numberline {1}{\ignorespaces Sample figure\relax }}{6}{figure.caption.5}% 
+\contentsline {figure}{\numberline {1}{\ignorespaces Automatic levelling of the flexion. The angle, $\theta $, of the flexion servo is constant with the ground as the arm moves (represented by the green dashed line) \cite {d.j.a.brenneis}.\relax }}{3}{figure.caption.4}% 
+\contentsline {figure}{\numberline {2}{\ignorespaces Diagram of the automatic levelling wrist bypass protheses \cite {d.j.a.brenneis}.\relax }}{3}{figure.caption.5}% 
+\contentsline {figure}{\numberline {3}{\ignorespaces Coordinate system and angles, $\phi $ and $\theta $. The projections of the IMU gravity vector (GV) can be used to calculate $\phi $ and $\theta $ \cite {d.j.a.brenneis}.\relax }}{4}{figure.caption.6}% 
+\contentsline {figure}{\numberline {4}{\ignorespaces Block diagram of the control loop for one servo.\relax }}{5}{figure.caption.7}% 
+\contentsline {figure}{\numberline {5}{\ignorespaces Sample figure\relax }}{10}{figure.caption.9}% 
