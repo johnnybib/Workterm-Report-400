@@ -131,29 +131,113 @@ Summary
 \pagebreak
 \section{Introduction}
 
-\subsection{Background}
+\subsection{Automatic Levelling Wrist Background}
+Powered wrist movement is rare in commercial systems, and many powered protheses have only one degree of freedom (DoF), usually rotation \cite{n.m.bajaj}. These limitations in ease of wrist movement in many upper limb prostheses force people with major upper limb loss to use compensatory movements \cite{s.l.carey}. Compensation occurs in trunk, shoulder, and elbow movements has been associated with causing musculoskeletal pain in the neck, upper back, shoulder, and remaining arm \cite{k.ostlie}.
 
+A two DoF automatic levelling wrist was developed by Dylan J. A. Brenneis in 2019 that addresses the issues with ease of wrist movement in wrist prosthetics \cite{d.j.a.brenneis}. Why it is useful. Uses a PID controller with manually tuned gains to level the wrist to make tasks easier [Dylan's thesis]. Users reported reliability issues [Dylan's thesis]. A more reliable control method should be implemented to improve the user experience.
+\subsubsection{Automatic Levelling Method}
+Angle definition
+Angle correction
+PID controller
+
+
+
+
+
+\subsection{Reinforcement Learning Background}
+Agent-Environment-Reward diagram
+\subsubsection{Q-Learning}
+Table action-values
+Update
+\subsubsection{Function Approximation}
+Update equation with function approx
+
+\subsection{Neural Network Background}
+Weights and forward prop, neurons, activation function
+\subsubsection{Backpropagation}
+Chain rule
+\subsubsection{Levenberg-Marquardt Algorithm}
+Show equation
+
+
+\section{Project Outline}
 \subsection{Problem Definition}
+Amii needs demos that demonstrate the capabilities of ml
+Amii needs a hardware demo specifically
+The automatic levelling wrist provides is a good candidate for improvement using ml
 
 
 \subsection{Objective}
-
-\section{Proposed Designs}
+Design an ML system to improve the performance of the automatic levelling wrist
 
 \subsection{Constraints}
 
 \begin{itemize}
-    \item Constraint
+		\item The solution must improve the performance of the automatic levelling wrist.
+    \item The solution must implement machine learning in some way.
+
 \end{itemize}
 
 \subsection{Criteria}
-The criteria considered for this project are as follows.
+The following criteria considered in choosing an appropriate solution are chosen such that the automatic levelling wrist reliably improves the user's ability to use the prosthetic.
 \begin{itemize}
-    \itme Criterion
+    \item The solution should minimize steady state error.
+		\item The solution should minimize response time.
+		\item The solution should minimize settling time.
+		\item The solution should maximize reliability and consistency.
 \end{itemize}
+Due to the nature of the problem, training time and data are difficult to acquire. Without a sophisticated simulation, data and training can only be collected and run in real time. Therefore, the solution should require minimal training time and data.
 
-\section{Selecting a Design}
-\subsection{}
+\section{Proposed Solutions}
+\subsection{Reinforcement Learning Methods}
+Tabular Q-learning
+Q-learning with function approximation
+
+
+\subsection{Neural Network Methods}
+Neural Network Controller
+PID auto-tuning trained with a model, using the Levenberg-Marquardt algorithm
+PID auto-tuning trained model-free, using the Levenberg-Marquardt algorithm
+PID auto-tuning trained model-free, using backpropagation
+
+\section{Solution Evaluation}
+\subsection{Q-learning - Tabular}
+Tabular control wasn't granular enough to enable precise control of the servo
+Even with a minimized state space (only using the IMU angle), it was still difficult to visit all states and learn making it unreliable.
+\subsection{Q-learning - Function Approximation}
+Not enough data to train the neural network, difficult to visit all states, no simulation (must train real-time which is very slow especially if testing different hyperparameters)
+Deadly triad (bootstrapping, function approximation and off-policy learning) - not guaranteed to converge
+
+\subsection{Neural Network Controller}
+Not enough data to generalize, better to make use of PID controller
+\subsection{PID Auto-Tuning - Trained with Model, using Levenberg-Marquardt}
+Requires a simulation for the servo, however the level of sophistication for the simulation does not need to be extremely high as in an RL setting. Uses a PID controller (so not starting from scratch) which makes it more reliable, as the PID controller on its own will achieve the objective of automatic levelling to a certain level. Therefore a simple simulation can be a starting point.
+Quick training for the neural network, as a simulation can tune the neural network many times faster than real time.
+\subsection{PID Auto-Tuning - Trained Model-Free, using Levenberg-Marquardt}
+Quick training for the neural network, as a simulation can tune the neural network many times faster than real time. However, another neural network must be trained to emulate the real system which requires real data. It was found that there was not enough real data to generalize to all situations. (generalizes well to what it saw, but not anything else like the APRBS used to find the jacobian)
+\subsection{PID Auto-Tuning - Trained Model-Free, using backpropagation}
+Same problems as above, as well as being difficult to implement, due to the statefulness of the PID controller.
+
+\subsection{Chosen Solution}
+The chosen solution was PID auto-tuning trained using a model, using the Levenberg-Marquardt algorithm.
+
+\section{PID Auto-Tuning Implementation}
+Required components: a transfer function or ode for the servo, a simulation, a neural network, a numerical implementation of the levenberg marquardt algorithm, a numerical jacobian calculator, an APRBS generator, a neural network implemented in C\#
+\subsection{Servo Transfer Function}
+
+\subsection{Single DoF Simulation}
+Best parameters for simulation
+
+\subsection{Neural Network Structure}
+5 inputs (error, angle, velocity), 4 nodes in hidden layer, 3 output nodes, leaky relu with alpha=0.3 activation function. Absolute value of output to keep positive (can't have negative gains)
+
+\subsection{Levenberg-Marquardt Algorithm Implementation}
+
+\subsection{Numerical Jacobian Calculation}
+
+\subsection{Amplitude Modulated Pseudo-Random Binary Signal (APRBS) Generation}
+
+
 
 \begin{table}[H]
 	\begin{center}
@@ -175,8 +259,6 @@ The criteria considered for this project are as follows.
 Sample equation
 \end{equation}
 
-\section{Implementation of Chosen Design}
-
 \begin{figure}[H]
 \centering \includegraphics[width=0.8\columnwidth]{UW.jpg}
 \caption{\label{fig:figure}Sample figure}
@@ -188,50 +270,68 @@ Sample equation
 \section{Conclusion}
 
 \section{Recommendations}
+Better Simulation (2 DoF, better approximation of moment of inertia for different servo positions, take torque due to gravity into account)
+
 
 \pagebreak
 
 \begin{thebibliography}{99}
-\bibitem{whatisacodec}
-"What is a CODEC? And why is it an important component of videoconferencing?", \textit{Jwhornvideoconference.com}, 2018. [Online]. Available: http://www.jwhornvideoconference.com/what-is-a-codec-and-why-is-it-an-important-component-of-videoconferencing. [Accessed: 16- Aug- 2018].
+\bibitem{s.l.carey}
+S. L. Carey, M. J. Highsmith, M. E. Maitland, and R. V. Dubey, “Compensatory movements
+of transradial prosthesis users during common tasks”, Clinical Biomechanics, vol. 23, no. 9,
+pp. 1128 –1135, 2008.
 
-\bibitem{s3}
-"Cloud Object Storage", \textit{Amazon Web Services, Inc.}, 2018. [Online]. Available: https://aws.amazon.com/s3/. [Accessed: 16- Aug- 2018].
+\bibitem{n.m.bajaj}
+N. M. Bajaj, A. J. Spiers, and A. M. Dollar, “State of the art in prosthetic wrists: Commercial and research devices”, in 2015 IEEE International Conference on Rehabilitation Robotics
+(ICORR), Aug. 2015, pp. 331–338.
 
-\bibitem{ec2}
-"Amazon EC2", \textit{Amazon Web Services, Inc.}, 2018. [Online]. Available: https://aws.amazon.com/ec2. [Accessed: 16- Aug- 2018].
+\bibitem{k.ostlie}
+K. Østlie, R. J. Franklin, O. H. Skjeldal, A. Skrondal, and P. Magnus, “Musculoskeletal pain
+and overuse syndromes in adult acquired major upper-limb amputees”, Archives of Physical
+Medicine and Rehabilitation, vol. 92, no. 12, pp. 1967 –1973, 2011.
 
-\bibitem{lambda}
-"AWS Lambda – Serverless Compute", \textit{Amazon Web Services, Inc.}, 2018. [Online]. Available: https://aws.amazon.com/lambda/. [Accessed: 16- Aug- 2018].
-
-\bibitem{dynamodb}
-"Amazon DynamoDB", \textit{Amazon Web Services, Inc.}, 2018. [Online]. Available: https://aws.amazon.com/dynamodb/. [Accessed: 16- Aug- 2018].
-
-\bibitem{firewall}
-"What is firewall? - Definition from WhatIs.com", \textit{SearchSecurity}, 2018. [Online]. Available: https://searchsecurity.techtarget.com/definition/firewall. [Accessed: 16- Aug- 2018].
-
-\bibitem{querystring}
-"What is a Query String?", \textit{Techopedia.com}, 2018. [Online]. Available: https://www.techopedia.com/definition/1228/query-string. [Accessed: 16- Aug- 2018].
-
-\bibitem{uuiddef}
-P. Leach, M. Mealling and R. Salz, "RFC 4122 - A Universally Unique IDentifier (UUID) URN Namespace", \textit{Tools.ietf.org}, 2005. [Online]. Available: https://tools.ietf.org/html/rfc4122\#section-4.2. [Accessed: 16- Aug- 2018].
-
-\bibitem{uuidunique}
-"Are UUIDs really unique?", \textit{Towards Data Science}, 2018. [Online]. Available: https://towardsdatascience.com/are-uuids-really-unique-57eb80fc2a87. [Accessed: 16- Aug- 2018].
-
-\bibitem{uuidunique2}
-"Advanced", \textit{2database.com}, 2018. [Online]. Available: http://www.h2database.com/html/advanced.html\#uuid. [Accessed: 16- Aug- 2018].
-
-\bibitem{statuscode}
-"HTTP/1.1: Status Code Definitions", \textit{W3.org}, 2018. [Online]. Available: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html. [Accessed: 16- Aug- 2018].
-
-\bibitem{mvc}
-"MVC Framework Introduction", \textit{www.tutorialspoint.com}, 2018. [Online]. Available: https://www.tutorialspoint.com/mvc\_framework/mvc\_framework\_introduction.htm. [Accessed: 16- Aug- 2018].
-
-\bibitem{https}
-"What is HTTPS?", \textit{Techopedia.com}, 2018. [Online]. Available: https://www.techopedia.com/definition/5361/hypertext-transport-protocol-secure-https. [Accessed: 16- Aug- 2018].
-
-
+\bibtem{d.j.a.brenneis}
+file:///C:/Users/James/Documents/Bypass_Prothesis/Brenneis_Dylan_JA_201903_MSc.pdf
+% \bibitem{whatisacodec}
+% "What is a CODEC? And why is it an important component of videoconferencing?", \textit{Jwhornvideoconference.com}, 2018. [Online]. Available: http://www.jwhornvideoconference.com/what-is-a-codec-and-why-is-it-an-important-component-of-videoconferencing. [Accessed: 16- Aug- 2018].
+%
+% \bibitem{s3}
+% "Cloud Object Storage", \textit{Amazon Web Services, Inc.}, 2018. [Online]. Available: https://aws.amazon.com/s3/. [Accessed: 16- Aug- 2018].
+%
+% \bibitem{ec2}
+% "Amazon EC2", \textit{Amazon Web Services, Inc.}, 2018. [Online]. Available: https://aws.amazon.com/ec2. [Accessed: 16- Aug- 2018].
+%
+% \bibitem{lambda}
+% "AWS Lambda – Serverless Compute", \textit{Amazon Web Services, Inc.}, 2018. [Online]. Available: https://aws.amazon.com/lambda/. [Accessed: 16- Aug- 2018].
+%
+% \bibitem{dynamodb}
+% "Amazon DynamoDB", \textit{Amazon Web Services, Inc.}, 2018. [Online]. Available: https://aws.amazon.com/dynamodb/. [Accessed: 16- Aug- 2018].
+%
+% \bibitem{firewall}
+% "What is firewall? - Definition from WhatIs.com", \textit{SearchSecurity}, 2018. [Online]. Available: https://searchsecurity.techtarget.com/definition/firewall. [Accessed: 16- Aug- 2018].
+%
+% \bibitem{querystring}
+% "What is a Query String?", \textit{Techopedia.com}, 2018. [Online]. Available: https://www.techopedia.com/definition/1228/query-string. [Accessed: 16- Aug- 2018].
+%
+% \bibitem{uuiddef}
+% P. Leach, M. Mealling and R. Salz, "RFC 4122 - A Universally Unique IDentifier (UUID) URN Namespace", \textit{Tools.ietf.org}, 2005. [Online]. Available: https://tools.ietf.org/html/rfc4122\#section-4.2. [Accessed: 16- Aug- 2018].
+%
+% \bibitem{uuidunique}
+% "Are UUIDs really unique?", \textit{Towards Data Science}, 2018. [Online]. Available: https://towardsdatascience.com/are-uuids-really-unique-57eb80fc2a87. [Accessed: 16- Aug- 2018].
+%
+% \bibitem{uuidunique2}
+% "Advanced", \textit{2database.com}, 2018. [Online]. Available: http://www.h2database.com/html/advanced.html\#uuid. [Accessed: 16- Aug- 2018].
+%
+% \bibitem{statuscode}
+% "HTTP/1.1: Status Code Definitions", \textit{W3.org}, 2018. [Online]. Available: https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html. [Accessed: 16- Aug- 2018].
+%
+% \bibitem{mvc}
+% "MVC Framework Introduction", \textit{www.tutorialspoint.com}, 2018. [Online]. Available: https://www.tutorialspoint.com/mvc\_framework/mvc\_framework\_introduction.htm. [Accessed: 16- Aug- 2018].
+%
+% \bibitem{https}
+% "What is HTTPS?", \textit{Techopedia.com}, 2018. [Online]. Available: https://www.techopedia.com/definition/5361/hypertext-transport-protocol-secure-https. [Accessed: 16- Aug- 2018].
+%
+%
 
 \end{thebibliography}
 
