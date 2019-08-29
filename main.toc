@@ -5,33 +5,35 @@
 \contentsline {section}{\numberline {3}Background}{2}{section.3}% 
 \contentsline {subsection}{\numberline {3.1}Automatic Levelling Wrist Background}{2}{subsection.3.1}% 
 \contentsline {subsubsection}{\numberline {3.1.1}Automatic Levelling Method}{4}{subsubsection.3.1.1}% 
-\contentsline {subsection}{\numberline {3.2}Reinforcement Learning Background}{5}{subsection.3.2}% 
-\contentsline {subsubsection}{\numberline {3.2.1}Q-Learning}{5}{subsubsection.3.2.1}% 
-\contentsline {subsubsection}{\numberline {3.2.2}Function Approximation}{5}{subsubsection.3.2.2}% 
-\contentsline {subsection}{\numberline {3.3}Neural Network Background}{5}{subsection.3.3}% 
-\contentsline {subsubsection}{\numberline {3.3.1}Backpropagation}{6}{subsubsection.3.3.1}% 
-\contentsline {subsubsection}{\numberline {3.3.2}Levenberg-Marquardt Algorithm}{6}{subsubsection.3.3.2}% 
-\contentsline {section}{\numberline {4}Proposed Solutions}{6}{section.4}% 
-\contentsline {subsection}{\numberline {4.1}Criteria and Constraints}{6}{subsection.4.1}% 
-\contentsline {subsection}{\numberline {4.2}Reinforcement Learning Methods}{6}{subsection.4.2}% 
-\contentsline {subsection}{\numberline {4.3}Neural Network Methods}{7}{subsection.4.3}% 
-\contentsline {section}{\numberline {5}Solution Evaluation}{7}{section.5}% 
-\contentsline {subsection}{\numberline {5.1}Q-learning - Tabular}{7}{subsection.5.1}% 
-\contentsline {subsection}{\numberline {5.2}Q-learning - Function Approximation}{7}{subsection.5.2}% 
-\contentsline {subsection}{\numberline {5.3}Neural Network Controller}{7}{subsection.5.3}% 
-\contentsline {subsection}{\numberline {5.4}PID Auto-Tuning - Trained with Model, using Levenberg-Marquardt}{7}{subsection.5.4}% 
-\contentsline {subsection}{\numberline {5.5}PID Auto-Tuning - Trained Model-Free, using Levenberg-Marquardt}{8}{subsection.5.5}% 
-\contentsline {subsection}{\numberline {5.6}PID Auto-Tuning - Trained Model-Free, using backpropagation}{8}{subsection.5.6}% 
-\contentsline {subsection}{\numberline {5.7}Chosen Solution}{8}{subsection.5.7}% 
-\contentsline {section}{\numberline {6}PID Auto-Tuning Implementation}{8}{section.6}% 
-\contentsline {subsection}{\numberline {6.1}Servo Transfer Function}{8}{subsection.6.1}% 
-\contentsline {subsection}{\numberline {6.2}Single DOF Simulation}{8}{subsection.6.2}% 
-\contentsline {subsection}{\numberline {6.3}Neural Network Structure}{9}{subsection.6.3}% 
-\contentsline {subsection}{\numberline {6.4}Levenberg-Marquardt Algorithm Implementation}{9}{subsection.6.4}% 
-\contentsline {subsection}{\numberline {6.5}Numerical Jacobian Calculation}{9}{subsection.6.5}% 
-\contentsline {subsection}{\numberline {6.6}Amplitude Modulated Pseudo-Random Binary Signal (APRBS) Generation}{9}{subsection.6.6}% 
-\contentsline {section}{\numberline {7}Results}{11}{section.7}% 
-\contentsline {section}{\numberline {8}Conclusion}{11}{section.8}% 
-\contentsline {section}{\numberline {9}Recommendations}{11}{section.9}% 
-\contentsline {section}{Appendices}{12}{section*.11}% 
-\contentsline {section}{\numberline {A}Appendix}{12}{Appendix.1.A}% 
+\contentsline {subsection}{\numberline {3.2}Neural Network Background}{6}{subsection.3.2}% 
+\contentsline {subsubsection}{\numberline {3.2.1}Backpropagation}{6}{subsubsection.3.2.1}% 
+\contentsline {subsubsection}{\numberline {3.2.2}Levenberg-Marquardt Algorithm}{7}{subsubsection.3.2.2}% 
+\contentsline {subsubsection}{\numberline {3.2.3}Numerically Calculating the Jacobian of the Servo}{7}{subsubsection.3.2.3}% 
+\contentsline {subsection}{\numberline {3.3}Reinforcement Learning Background}{8}{subsection.3.3}% 
+\contentsline {subsubsection}{\numberline {3.3.1}Q-Learning}{9}{subsubsection.3.3.1}% 
+\contentsline {subsubsection}{\numberline {3.3.2}Function Approximation}{10}{subsubsection.3.3.2}% 
+\contentsline {section}{\numberline {4}Proposed Solutions}{10}{section.4}% 
+\contentsline {subsection}{\numberline {4.1}Criteria and Constraints}{10}{subsection.4.1}% 
+\contentsline {subsection}{\numberline {4.2}Neural Network Methods}{11}{subsection.4.2}% 
+\contentsline {subsubsection}{\numberline {4.2.1}PID Auto-Tuning, Trained Model-Free using Backpropagation}{11}{subsubsection.4.2.1}% 
+\contentsline {subsubsection}{\numberline {4.2.2}PID Auto-Tuning, Trained Model-Free using the Levenberg-Marquardt Algorithm}{12}{subsubsection.4.2.2}% 
+\contentsline {subsubsection}{\numberline {4.2.3}PID Auto-Tuning, Trained with a Model using the Levenberg-Marquardt Algorithm}{12}{subsubsection.4.2.3}% 
+\contentsline {subsection}{\numberline {4.3}Reinforcement Learning Methods}{13}{subsection.4.3}% 
+\contentsline {section}{\numberline {5}Solution Evaluation}{13}{section.5}% 
+\contentsline {subsection}{\numberline {5.1}Q-learning - Tabular}{13}{subsection.5.1}% 
+\contentsline {subsection}{\numberline {5.2}Q-learning - Function Approximation}{13}{subsection.5.2}% 
+\contentsline {subsection}{\numberline {5.3}PID Auto-Tuning - Trained with Model, using Levenberg-Marquardt}{13}{subsection.5.3}% 
+\contentsline {subsection}{\numberline {5.4}PID Auto-Tuning - Trained Model-Free, using Levenberg-Marquardt}{14}{subsection.5.4}% 
+\contentsline {subsection}{\numberline {5.5}PID Auto-Tuning - Trained Model-Free, using backpropagation}{14}{subsection.5.5}% 
+\contentsline {subsection}{\numberline {5.6}Chosen Solution}{14}{subsection.5.6}% 
+\contentsline {section}{\numberline {6}PID Auto-Tuning Implementation}{14}{section.6}% 
+\contentsline {subsection}{\numberline {6.1}Servo Transfer Function}{14}{subsection.6.1}% 
+\contentsline {subsection}{\numberline {6.2}Single DOF Simulation}{14}{subsection.6.2}% 
+\contentsline {subsection}{\numberline {6.3}Neural Network Structure}{15}{subsection.6.3}% 
+\contentsline {subsection}{\numberline {6.4}Levenberg-Marquardt Algorithm Implementation}{15}{subsection.6.4}% 
+\contentsline {subsection}{\numberline {6.5}Amplitude Modulated Pseudo-Random Binary Signal (APRBS) Generation}{15}{subsection.6.5}% 
+\contentsline {section}{\numberline {7}Results}{16}{section.7}% 
+\contentsline {section}{\numberline {8}Conclusion}{16}{section.8}% 
+\contentsline {section}{\numberline {9}Recommendations}{16}{section.9}% 
+\contentsline {section}{Appendices}{17}{section*.12}% 
+\contentsline {section}{\numberline {A}Appendix}{17}{Appendix.1.A}% 
