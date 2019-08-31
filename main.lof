@@ -2,5 +2,6 @@
 \contentsline {figure}{\numberline {2}{\ignorespaces Diagram of the automatic levelling wrist bypass protheses \cite {d.j.a.brenneis}.\relax }}{4}{figure.caption.5}% 
 \contentsline {figure}{\numberline {3}{\ignorespaces Coordinate system and angles, $\phi $ and $\theta $. The projections of the IMU gravity vector (GV) can be used to calculate $\phi $ and $\theta $ \cite {d.j.a.brenneis}.\relax }}{5}{figure.caption.6}% 
 \contentsline {figure}{\numberline {4}{\ignorespaces Block diagram of the control loop for one servo.\relax }}{6}{figure.caption.7}% 
-\contentsline {figure}{\numberline {5}{\ignorespaces Interaction between an agent and the environment it exists in \cite {r.s.sutton}.\relax }}{9}{figure.caption.8}% 
-\contentsline {figure}{\numberline {6}{\ignorespaces Sample figure\relax }}{15}{figure.caption.10}% 
+\contentsline {figure}{\numberline {5}{\ignorespaces Block diagram of the training process for the PID neural network using the servo neural network to mimic the actual servo output.\relax }}{10}{figure.caption.8}% 
+\contentsline {figure}{\numberline {6}{\ignorespaces Block diagram of the training process for the servo neural network.\relax }}{11}{figure.caption.9}% 
+\contentsline {figure}{\numberline {7}{\ignorespaces Sample figure\relax }}{15}{figure.caption.12}% 

@@ -230,11 +230,14 @@ INPUT ./servo_system.png
 INPUT ./servo_system.png
 INPUT c:/texlive/2019/texmf-dist/fonts/tfm/public/cm/cmbx8.tfm
 INPUT c:/texlive/2019/texmf-dist/fonts/tfm/public/cm/cmbx6.tfm
-INPUT rl_diagram.png
-INPUT ./rl_diagram.png
-INPUT ./rl_diagram.png
 INPUT c:/texlive/2019/texmf-dist/tex/latex/base/omscmr.fd
 INPUT c:/texlive/2019/texmf-dist/tex/latex/base/omscmr.fd
+INPUT pid_model_free_backprop.png
+INPUT ./pid_model_free_backprop.png
+INPUT ./pid_model_free_backprop.png
+INPUT servo_nn_training.png
+INPUT ./servo_nn_training.png
+INPUT ./servo_nn_training.png
 INPUT UW.jpg
 INPUT ./UW.jpg
 INPUT c:/texlive/2019/texmf-dist/fonts/tfm/public/cm/cmti12.tfm
