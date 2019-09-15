@@ -16,6 +16,9 @@
 \usepackage{fancyhdr}
 \usepackage{caption}
 \usepackage{booktabs}
+\usepackage{algorithm,algpseudocode}
+
+
 
 
 \setlength{\parskip}{1em}
@@ -35,7 +38,7 @@
 \newcommand{\di}{\partial}
 %++++++++++++++++++++++++++++++++++++++++
 
-\title{Title}
+\title{Design of a PID Auto-Tuner for an Automatic Levelling Wrist}
 \author{}
 \date{\today}											% Date
 
@@ -194,7 +197,7 @@ Learning for a neural network is most commonly accomplished by backpropagation. 
 \end{equation}
 
 \subsubsection{Levenberg-Marquardt Algorithm}\label{sec:levenberg}
-Another method for training neural networks is using the Levenberg-Marquardt algorithm. The Levebnerg-Marquardt algorithm uses the jacobian of the output with respect to the weights of the neural network to solve for an adjustment for each weight. Equation \ref{eq:levenberg} is solved for $\sigma$ to determine the adjustments for each weight.
+Another method for training neural networks is using the Levenberg-Marquardt algorithm. The Levenberg-Marquardt algorithm uses the jacobian of the output with respect to the weights of the neural network to solve for an adjustment for each weight. Equation \ref{eq:levenberg} is solved for $\sigma$ to determine the adjustments for each weight.
 
 \begin{equation}
 	\label{eq:levenberg}
@@ -236,6 +239,14 @@ To numerically calculate jacobian of a servo, each weight is individually change
 	& h_p = 0, p \neq i
 \end{split}
 \end{equation}
+
+\subsection{Amplitude Modulated Pseudo-Random Binary Signal}
+An amplitude modulated pseudo-random binary signal (APRBS) can be used to excite a system such that all frequencies are excited equally \cite{o.nelles}. The signal approximates the spectrum and statistical properties of	white noise, as it has a mean of one and variance of zero. The signal is also deterministic, making it consistent between trials. The method used to generate an APRBS in this project is outlined in Johannes Günther's paper \cite{j.gunther}. Figure \ref{fig:aprbs} is an example of an APRBS with a maximum amplitude of 1, 500 step length, and maximum hold time of 100 steps. The orange signal is the same APRBS with a first order butterworth filter applied to make the edges less "sharp".
+
+\begin{figure}[H]
+\centering \includegraphics[width=0.8\columnwidth]{aprbs.png}
+\caption{\label{fig:aprbs}APRBS with a maximum amplitude of 1, 500 step length, and maximum hold time of 100 steps. With and without first order butterworth filter.}
+\end{figure}
 
 % \subsection{Reinforcement Learning Background}
 % Reinforcement learning is a machine learning method based on an agent interacting with its environment. The agent takes actions within the environment, which leads to a new state within the environment and a reward for the action. Figure \ref{fig:rl_diagram} describes the interaction between the agent and the environment it exists in.
@@ -300,6 +311,7 @@ The following criteria considered in choosing an appropriate solution are chosen
 \end{itemize}
 Due to the nature of the problem, training time and data are difficult to acquire. Without a simulation, data and training can only be collected and run in real time. Therefore, the solution should require minimal training time and data, or be able to make use of a simulation.
 
+
 \subsection{Neural Network Methods}
 The three neural network methods proposed in this section make use of the PID control loop described in Figure \ref{fig:servo_system}. A neural network that outputs the PID gains, $K_p$, $K_i$, and $K_d$ is added to the control loop. The neural network takes the error between the setpoint and the current angle of the servo, the current angle  of the servo, and the velocity of the servo. The goal is to train the neural network so that it will output appropriate gains for any situation, such that the system has the best response time and error for that situation. The rotation and flexion servos will use separately trained neural networks to output gains for their respective PID controllers. In this section the rotation servo will be used to explain the method, but the same method can be applied to both rotation and flexion servos.
 
@@ -358,7 +370,6 @@ Rather than using backpropagation to train the weights of the PID neural network
 \subsubsection{PID Auto-Tuning, Trained with a Model using the Levenberg-Marquardt Algorithm}
 Similar to section \ref{sec:levenberg_model_free} this method uses the Levenberg-Marquardt algorithm the train the PID neural network. However, when numerically calculating the jacobian, rather than using a neural network to simulate the servo response to small weight changes, a mathematical model of the servo is used. Equation \ref{eq:servo_tf} is the simplified transfer function of the servo, assuming the electrical dynamics of the servo are much faster than the mechanical dynamics \cite{m.r.o.a.maximo}.
 
-
 \begin{equation}
 	\label{eq:servo_tf}
 	\frac{Y(s)}{U(s)} = \frac{N \eta K_t (K_d s^2 + K_p s + K_i)}{R (J_l + J_m N^2 \eta)s^3 + (b_m N^2 \eta R + \frac{K_t N^2 \eta}{K_\omega} + N \eta K_t K_d)s^2 + N \eta K_t K_p s + N \eta K_t K_i}
@@ -378,8 +389,17 @@ The MX-28AT servo contains an internal PID controller with internal gains. Since
 
 Here, $V_s$ is the source voltage which is $12 V$, and $P$, $I$, and $D$ are gains set by the user, which are $P=32$, $I=0$, and $D=0$ by default. The user manual for the MX-28AT also states that the gains set by the user must be converted to get their values in ticks, hence the multiplication by $\frac{1}{8}$, $\frac{1000}{2048}$ and $\frac{4}{1000}$ for $P$, $I$, and $D$ respectively \cite{robotis}.
 
-The load inertia, $J_l$, depends on the servo. For the rotation servo the inertia is estimated as the inertia of a rectangular prism, which represents the flexion servo, rotating on its center axis, and a point mass, which represents the gripper, whose position above the axis of rotation depends on the angle of the flexion servo. For the flexion servo the inertia is estimated as the inertia of a rectangular prism, which represents the gripper, rotating around an axis offset from its center by half its length and the length of the bracket attaching the gripper to the flexion servo. The inertia calculations are shown in equation \ref{eq:inertia}.
+The load inertia, $J_l$, depends on the servo. For the rotation servo the inertia is estimated as the inertia of a rectangular prism, which represents the flexion servo, rotating on its center axis, and a point mass, which represents the gripper, whose position above the axis of rotation depends on the angle of the flexion servo. For the flexion servo the inertia is estimated as the inertia of a rectangular prism, which represents the gripper, rotating around an axis offset from its center by half its length and the length of the bracket attaching the gripper to the flexion servo. Although these assumptions oversimplify the inertia, the load inertia, $J_l$, is relatively small compared to the other term, $J_mN^2\eta$, in the $s^3$ term of the denominator ($J_l$ is on an order of magnitude of $10^-4$ and $J_mN^2\eta$ is on an order of magnitude of $10^-3$). Therefore, any error incurred due to these assumptions will be small. The inertia calculations are shown in equation \ref{eq:inertia}.
 
+\begin{equation}
+\begin{split}
+	\label{eq:inertia}
+	& J_{l, rot} = m \frac{b^2 + h^2}{12} + (l + c)^2 sin(\theta)^2 \\
+	& J_{l, flex} = m (d^{2/3} + d l + l^2)
+\end{split}
+\end{equation}
+
+Here, $m$, is the mass of the MX-28AT servo, $b$ is the width of the servo, $h$ is the height of the servo, $d$ is the depth of the servo, $l$ is the length of the bracket connecting the gripper to the flexion servo, and $c$ is the center of mass of the gripper.
 
 
 The other parameters for equation \ref{eq:servo_tf} are described in table \ref{tab:servo_params}.
@@ -402,6 +422,16 @@ The other parameters for equation \ref{eq:servo_tf} are described in table \ref{
 	\end{center}
 \end{table}
 
+To account for voltage saturation of the power supply at $12V$, the input signal is saturated so that it doesn't exceed this limit. As an initial guess, the saturation limit is set to $10\degrees$. This means that the control signal, $u(t)$, is saturated at $-10\degrees$ and $10\degrees$.
+
+Figure \ref{fig:pid_model_levenberg} is the control loop block diagram with the PID neural network and the servo model for training. Once training of the PID neural network is complete, the neural network weights can be used to generate the PID gains for the actual servo in the physical implementation.
+
+
+\begin{figure}[H]
+\centering \includegraphics[width=0.8\columnwidth]{pid_model_levenberg.png}
+\caption{\label{fig:pid_model_levenberg}Block diagram of the training process for the PID neural network using the servo model.}
+\end{figure}
+
 
 % \subsection{Reinforcement Learning Methods}
 % Tabular Q-learning
@@ -409,6 +439,28 @@ The other parameters for equation \ref{eq:servo_tf} are described in table \ref{
 
 
 \section{Solution Evaluation}
+Judging the three proposed solution methods without implementing them shows that they each have the potential to improve the performance of the automatic levelling wrist according to the criteria. The deciding factor is the amount of data needed to train each solution method. For the model-free methods, the methods that use the servo neural network, real servo data is needed. Although servo data can be recorded and reused, many data points are needed to train the neural network in order for the neural network to learn the servo's time-domain function. A neural network is trained on a 8000 data point training set and its performance is tested on a 2000 data point test set. The training and test data consist of an APRBS with a maximum amplitude of $\frac{\pi}{2}$ radians as the input, and the actual servos output as the label. Data is collected at a rate of 5ms per time step. Figure \ref{fig:model_results_1} shows that the neural network's prediction on the test set is close to the actual servo.
+
+\begin{figure}[H]
+\centering \includegraphics[width=0.8\columnwidth]{model_results_1.png}
+\caption{\label{fig:model_results_1}Actual and predicted servo position for APRBS with a maximum amplitude of $\frac{\pi}{2}$ over 2000 time steps, at 5ms per time step.}
+\end{figure}
+
+Figure \ref{fig:model_results_2} shows the results of testing the neural network on a $\frac{\pi}{2}$ step input. While the response somewhat resembles what the actual servo's response, it does not perfectly track the input.
+
+\begin{figure}[H]
+\centering \includegraphics[width=0.8\columnwidth]{model_results_2.png}
+\caption{\label{fig:model_results_2} Neural network prediction vs actual for the step input.}
+\end{figure}
+
+These problems could potentially be rectified by using more training data. However, the results for the mathematical model are promising, without the need to collect data. Figure \ref{fig:simulation_results_1} shows the same test as the one ran on the neural network model. It shows that the mathematical model can closely simulate the servo.
+
+\begin{figure}[H]
+\centering \includegraphics[width=0.8\columnwidth]{simulation_results_1.png}
+\caption{\label{fig:simulation_results_1}Simulation vs actual for the step input.}
+\end{figure}
+
+Since no data is needed for mathematical model and the mathematical model can closely simulate the actual servo, the chosen solution method is PID auto tuning trained with a model using the Levenberg-Marquardt algorithm.
 % \subsection{Q-learning - Tabular}
 % Tabular control wasn't granular enough to enable precise control of the servo
 % Even with a minimized state space (only using the IMU angle), it was still difficult to visit all states and learn making it unreliable.
@@ -416,68 +468,207 @@ The other parameters for equation \ref{eq:servo_tf} are described in table \ref{
 % Not enough data to train the neural network, difficult to visit all states, no simulation (must train real-time which is very slow especially if testing different hyperparameters)
 % Deadly triad (bootstrapping, function approximation and off-policy learning) - not guaranteed to converge
 
-\subsection{PID Auto-Tuning - Trained with Model, using Levenberg-Marquardt}
-Requires a simulation for the servo, however the level of sophistication for the simulation does not need to be extremely high as in an RL setting. Uses a PID controller (so not starting from scratch) which makes it more reliable, as the PID controller on its own will achieve the objective of automatic levelling to a certain level. Therefore a simple simulation can be a starting point.
-Quick training for the neural network, as a simulation can tune the neural network many times faster than real time.
-\subsection{PID Auto-Tuning - Trained Model-Free, using Levenberg-Marquardt}
-Quick training for the neural network, as a simulation can tune the neural network many times faster than real time. However, another neural network must be trained to emulate the real system which requires real data. It was found that there was not enough real data to generalize to all situations. (generalizes well to what it saw, but not anything else like the APRBS used to find the jacobian)
-\subsection{PID Auto-Tuning - Trained Model-Free, using backpropagation}
-Same problems as above, as well as being difficult to implement, due to the statefulness of the PID controller.
-
-\subsection{Chosen Solution}
-The chosen solution was PID auto-tuning trained using a model, using the Levenberg-Marquardt algorithm.
-
 \section{PID Auto-Tuning Implementation}
-Required components: a transfer function or ode for the servo, a simulation, a neural network, a numerical implementation of the levenberg marquardt algorithm, a numerical jacobian calculator, an APRBS generator, a neural network implemented in C\#
-\subsection{Servo Transfer Function}
+The control software for the automatic levelling wrist is implemented in C\# \cite{blincdev}. However, Python provides a better environment for machine learning. First, Python is used for training the PID neural network. Then after the neural network is trained, the weights are copied into an identical neural network in the C\# control code.
 
-\subsection{Single DOF Simulation}
-Best parameters for simulation
+\subsection{Simulation Implementation}
+The method used to simulate the servo from the servo's mathematical model is SciPy's odeint function \cite{odeint}. This function receives an initial state, an array of timesteps, and an ordinary differential equation (ODE). The ODE is found by computing the inverse Laplace transform of the servo's transfer function. Equation \ref{eq:ode} is the ODE for the servo.
 
-\subsection{Neural Network Structure}
-5 inputs (error, angle, velocity), 4 nodes in hidden layer, 3 output nodes, leaky relu with alpha=0.3 activation function. Absolute value of output to keep positive (can't have negative gains)
+\begin{equation}
+	\label{eq:ode}
+	\ddot y(t) = \frac{- b_m N^2 \eta R - \frac{K_t N^2 \eta}{K_\omega + N \eta K_t K_d}}{R(J_l + J_m N^2 \eta)} \dot y(t) + \frac{-N \eta K_t K_p}{R(J_l + J_m N^2 \eta)} y(t) + \frac{N \eta K_t K_p}{R(J_l + J_m N^2 \eta)} u(t)
+\end{equation}
 
-\subsection{Levenberg-Marquardt Algorithm Implementation}
+To better simulate the actual servo, an angle sampling delay, $a_{angle}$, and a control signal delay, $a_{control}$, are  implemented into the simulation. This is because the angle reading from the actual IMU, and the reaction from the servo to a control signal from the PID controller can be delayed. The delays are mathematically described in equation \ref{eq:delays}.
 
+\begin{equation}
+\begin{split}
+	\label{eq:delays}
+	& \phi_{delayed}(t) = \phi(t - a_{angle}) \\
+	& u_{delayed}(t) = u(t - a_{control})
+\end{split}
+\end{equation}
 
-\subsection{Amplitude Modulated Pseudo-Random Binary Signal (APRBS) Generation}
+To tune the simulation to match the actual servo, a grid search over a parameter space for the time step length, angle sampling delay, saturation, and control delay, is performed. For each parameter combination, the response of the simulation is compared to the actual servo's response to a step response. The parameter combination with the lowest root-mean-squared error when compared to the actual response is chosen as the best parameter combination. Figure \ref{fig:paramcombo} compares the servo response to a step input for the actual servo and the simulation with the best parameters. Table \ref{tab:bestparams} shows the best parameters from the grid search.
 
-
+\begin{figure}[H]
+\centering \includegraphics[width=0.8\columnwidth]{paramcombo.png}
+\caption{\label{fig:paramcombo}Tuned simulation vs actual for a step input.}
+\end{figure}
 
 \begin{table}[H]
 	\begin{center}
-		\caption{Sample table2}
-        \label{tab:sampletable}
-        \begin{tabular}{l|l|l|l|l}
-        Requests/Second & Required Size & Cores & Memory (GiB) & Cost (\$/month)\\
-        \hline
-        10 & t2.small & 1 & 2 & 16.56\\
-        100 & t2.medium & 2 & 4 & 33.41\\
-        1000 & t2.large & 2 & 8 & 66.82\\
-        10000 & t2.xlarge & 4 & 16 & 133.63\\
+		\caption{Best Parameters for the Simulation}
+        \label{tab:bestparams}
+        \begin{tabular}{l|l|l}
+					\hline
+        	Time step length & $dt$ & $0.04$ s \\
+					Angle sampling delay & $a_{angle}$ & $3$ time steps \\
+					Saturation point & $s$ & $8.789 \degrees$ \\
+					Control sampling delay & $a_{control}$ & $0$ time steps \\
         \end{tabular}
 	\end{center}
 \end{table}
 
+
+Algorithm \ref{alg:simulation} shows how Figure \ref{fig:pid_model_levenberg} is implemented in code to run a simulation. Here, $T$ is the number of timesteps, each with a length $dt$, $t_i$ is the time at timestep $i$, $r(t)$ is the setpoint in degrees, $d(t)$ is the disturbance in degrees, $y(t)$ is the angle of the servo in radians, $\phi(t)$ is the IMU angle in degrees, $e(t)$ is the error between the setpoint and the IMU angle, $u(t)$ is the control signal in degrees, $y_0$ and $\dot y_0$ are the initial conditions of the servo. $\phi(t)$ is defined such that when $y(t) = \SI{0}{rad}$ and $d(t) = 0\degrees$, the servo angle is $\phi(t)=180\degrees$. This is consistent with how the servo angle is defined in figure \ref{fig:angles}.
+
+\begin{algorithm}
+	\caption{Servo Simulation}\label{alg:simulation}
+	\begin{algorithmic}[1]
+		\State Input: $T$, $r(t)$, $d(t)$, $y_0$, $\dot y_0$.
+		\State Output: $\phi(t)$.
+		\For{$i = 0$ to $T$}
+			\State $e(t_i) = r(t_i) - \phi(t_{i-1-a_{control}})$
+			\Comment Get error with delayed angle sample.
+
+			\State $\dot y (t_{i-1}) =\frac{y(t_{i-1}) - y(t_{i-2})}{t_{i-1} - t_{i-2}}$
+			\Comment Calculate velocity with first backwards difference.
+
+			\State $K_p, K_i, K_d =$ Get\_Gains($e(t_i), \phi(t_{i-1}), \dot y(t_{i-1})$)
+			\Comment Predict the PID gains with the PID neural network.
+
+			\State PID.Set\_Gains($K_p, K_i, K_d$)
+			\State $u(t_i) = $PID.Get\_Control\_Signal($e(t_i)$)
+			\Comment Get control signal.
+
+			\State $u_{delay} = u(t_{i-a_{angle}})$
+			\Comment Get delayed control signal.
+			\State $u_{delay\_sat} = $min(max($u_{delay}, -s$), $s$)
+			\Comment Saturate the control signal.
+
+			\State $\dot y_0, y_0 = $SciPy.odeint($\dot y_0, y_0, [t_{i-1}, t_i], u_{delay\_sat}$)
+			\Comment Run odeint for one timestep.
+			\State $\phi(t_i) = y_0 \frac{180}{\pi} + 180 + d(t_i)$
+			\Comment Calculate $\phi$ by adding disturbance and $180 \degrees$.
+		\EndFor
+		\State \Return $\phi$
+		\Comment Return time response of the servo.
+	\end{algorithmic}
+\end{algorithm}
+
+\subsection{PID Neural Network Training}
+The PID neural network is trained using the Levenberg-Marquardt algorithm. Algorithm \ref{alg:training} describes this process \cite{e.reichensdorfer}. Here, the values are the same as in algorithm \ref{alg:simulation}. For training, $d(t)$ is an APRBS signal with length $25.0 s$, peak-to-peak amplitude of $45 \degrees$ and maximum hold time of $5.0s$. $x$ starts at 200 samples, and increases by 200 for each trial. 10 trials are run in total. The best weights are chosen from the 10 trials, according to which weights yield the lowest root mean squared error (RMSE) between the servo angle and the setpoint. Because the difference in load inertias for the rotation servo and flexion servo is small, it is assumed that the neural network will work similarly for both servos, so the same weights can be used for both servos.
+
+\begin{algorithm}
+	\caption{Servo Simulation}\label{alg:training}
+	\begin{algorithmic}[1]
+		\State Input: $T$, $r(t)$, $d(t)$, $y_0$, $\dot y_0$.
+		\State Output: Trained PID Neural Network Weights $\bf{w}$.
+		\While{Trials left}
+			\State Perform truncated random initialization for neural network weights, $\bf{w}$.
+			\State $T_{tmp}=T(t_0 ... t_x),r_{tmp}=r(t_0 ... t_x), d_{tmp}=d(t_0 ... t_x)$
+			\Comment Sample first $x$ values of $T$, $r$, and $d$.
+			\While{Not converged}
+				\State $J_w = $Compute\_Jacobian($T$, $r(t)$, $d(t)$, $y_0$, $\dot y_0$)
+				\Comment Numerically Compute jacobian using equation \ref{eq:jacobian_numerical_calc} and simulation from algorithm \ref{alg:simulation}.
+				\State $\phi_{sim}$ = Simulate($T$, $r(t)$, $d(t)$, $y_0$, $\dot y_0$)
+				\Comment Simulate servo response.
+
+				\State $\sigma = [J_w^T J_w + \lambda I]^-1 J_w^T [\phi_{sim} - r]$
+				\Comment Solve Levenberg-Marquardt equation for $\sigma$.
+
+				\If{RMSE for simulation with  $\bf{w} + \sigma <$ RMSE for simulation with $\bf{w}$}
+					\State $\bf{w} \leftarrow \bf{w} + \sigma$
+					\State $\lambda = \frac{\lambda}{2}$
+				\Else
+					\State $\lambda = 2\lambda}$
+				\EndIf
+
+			\EndWhile
+			\If{RMSE for simulation with $\bf{w} < $ RMSE for simulation with $\bf{w}_{best}$}
+				\State $\bf{w}_{best} \leftarrow \bf{w}$
+				\State Increase number of samples, $x$.
+			\EndIf
+		\EndWhile
+		\State \Return $\bf{w}_{best}$
+	\end{algorithmic}
+\end{algorithm}
+
+
+\subsection{Neural Network Structure}
+The structure of the neural network is shown in figure \ref{fig:nn_structure}. The neural network structure consists of 5 input nodes, 4 hidden nodes, and 3 output nodes. The input nodes consist of normalized error, normalized angle, normalized velocity, and activation values from hidden nodes 2 and 3. Normalization is performed using equation \ref{eq:normalization} which scales the inputs to a value between 0 and 1. Normalization is important, as it ensures the scale of each input value is equal relative to each other, so no single input can "overshadow" the other inputs \cite{}. The activation values from hidden nodes 2 and 3 are used to give the network a one time-step recurrence, which can aid in applications of temporal nature such as a control system \cite{j.gunther}.
+
 \begin{equation}
-\label{eq:equation}
-Sample equation
+	\label{eq:normalization}
+	x_{normalized} = \frac{x - x_{min}}{x_{max} - x_{min}}
 \end{equation}
 
 \begin{figure}[H]
-\centering \includegraphics[width=0.8\columnwidth]{UW.jpg}
-\caption{\label{fig:figure}Sample figure}
+\centering \includegraphics[width=0.8\columnwidth]{nn_structure.png}
+\caption{\label{fig:nn_structure}Structure of the PID neural network.}
 \end{figure}
-\pagebreak
+
+The activation function used at the hidden layer is a leaky ReLU with a slope of $0.3$. Equation \ref{eq:leakyrelu} is the equation describing a leaky ReLU.
+
+\begin{equation}
+	\label{eq:leakyrelu}
+	a = \[ \begin{cases}
+      0.3z & z\leq 0 \\
+      z & z > 0
+			\end{cases}
+	 \]
+\end{equation}
 
 \section{Results}
+The PID neural network training was performed for the rotation servo for 10 trials using the APRBS shown in figure \ref{fig:aprbs_train}. The best trial was trial three, which yielded an RMSE of $22.034$ on the training APRBS.
+
+\begin{figure}[H]
+\centering \includegraphics[width=0.8\columnwidth]{aprbs_train.png}
+\caption{\label{fig:aprbs_train}APRBS used for training.}
+\end{figure}
+
+After training, the neural network weights were copied into the PID neural network for both the rotation servo and the flexion servo in the C\# program. A test was run to compare the step response of the automatic levelling wrist with and without PID Auto-Tuning. Figure \ref{fig:rotation_results} show the results of this test for the rotation servo. Figure \ref{fig:rotation_gains} shows the value of the gains at each step in the test. Table \ref{tab:rmse_results} is the RMSE values for the rotation and flexion servo step response with and without PID auto-tuning. Analyzing figure \ref{fig:rotation_results} and figure \ref{fig:flexion_results} shows that PID auto-tuning can reduce the response time of the system, while also reducing overshoot and oscillations. RMSE was decreased by approximately $30\%$ for both the rotation and flexion servos when PID auto-tuning was used.
+
+\begin{table}[H]
+	\begin{center}
+		\caption{RMSE Values for Step Responses}
+        \label{tab:rmse_results}
+        \begin{tabular}{l|l|l}
+					& w/o PID Auto-Tuning & w/ PID Auto-Tuning \\
+					\hline
+        	Rotation & $1383.64$ & $995.86$ \\
+					Flexion & $1553.36$ & $1027.76$ \\
+        \end{tabular}
+	\end{center}
+\end{table}
+
+\begin{figure}[H]
+\centering \includegraphics[width=0.8\columnwidth]{rotation_results.png}
+\caption{\label{fig:rotation_results}Rotation servo step response with and without PID Auto-Tuning.}
+\end{figure}
+
+\begin{figure}[H]
+\centering \includegraphics[width=0.8\columnwidth]{rotation_gains.png}
+\caption{\label{fig:rotation_gains}PID gains output by the rotation PID neural network during the step response test.}
+\end{figure}
+
+\begin{figure}[H]
+\centering \includegraphics[width=0.8\columnwidth]{flexion_results.png}
+\caption{\label{fig:flexion_results}Flexion servo step response with and without PID Auto-Tuning.}
+\end{figure}
+
+\begin{figure}[H]
+\centering \includegraphics[width=0.8\columnwidth]{flexion_gains.png}
+\caption{\label{fig:flexion_gains}PID gains output by the flexion PID neural network during the step response test.}
+\end{figure}
+
 
 \section{Conclusion}
+From the results it can be seen that PID auto-tuning can significantly improve the performance of the automatic levelling wrist. PID auto-tuning shows an RMSE decrease of approximately $30\%$ for both servos, as well as reduced response time, overshoot and oscillations. Figure \ref{fig:rotation_gains} and figure \ref{fig:flexion_gains} show how the neural network acts in reaction to a disturbance. First the neural network increases the gains of $K_p$ and $K_i$, to increase response time and tracking. Then as the servo moves closer to the setpoint, the PID gains are decreased to more stable values so that overshoot and oscillations are reduced.
+
+From the results it can also be seen that the consequences of sharing weights between the rotation and flexion servos do not greatly affect the performance of the PID auto-tuning network, as the performance of the rotation and flexion servos are on par with each other.
+
+In conclusion, PID auto-tuning for the automatic levelling wrist provides a tangible demo to show how machine learning can significantly improve the performance of a hardware system.
 
 \section{Recommendations}
-Better Simulation (2 DOF, better approximation of moment of inertia for different servo positions, take torque due to gravity into account)
+Although the PID auto-tuner can improve the performance of the automatic levelling wrist there is room for improvement.
 
+The training process can be improved to include more trials as well as variations in the neural network structure. More trials would increase the chance that a good initialization is found, as initialization is random. Trying different neural network structures such as changing number of nodes, changing activation functions, and changing which node is recurrent could lead to an increase in performance, as the structure proposed in this project is not known to be optimal.
 
+The position of the flexion servo can affect the response of the rotation servo because the load moment of inertia changes depending on the position of the flexion servo. A similar problem arises when a load is applied to the gripper, as the added load will increase the load moment of inertia for the rotation and flexion servos. These changing moments of inertia are not considered in the simulation and as a results the PID neural network is not trained to handle these situations. To address this problem the neural network should include the flexion servo position and sensed load in its inputs (the MX-28AT servos have load sensors). To supplement this, training should include situations with varying loads so that it can learn to adapt to these differing situations.
+
+With these improvements and with further tuning of the simulation parameters, PID auto-tuning can greatly improve the performance of the automatic levelling wrist so that it is more reliable, and more intuitive for users to use.
 \pagebreak
 
 \begin{thebibliography}{99}
@@ -490,8 +681,6 @@ S. L. Carey, M. J. Highsmith, M. E. Maitland, and R. V. Dubey, “Compensatory m
 of transradial prosthesis users during common tasks”, \textit{Clinical Biomechanics}, vol. 23, no. 9,
 pp. 1128 –1135, 2008.
 
-
-
 \bibitem{k.ostlie}
 K. Østlie, R. J. Franklin, O. H. Skjeldal, A. Skrondal, and P. Magnus, “Musculoskeletal pain
 and overuse syndromes in adult acquired major upper-limb amputees”, \textit{Archives of Physical
@@ -500,9 +689,14 @@ Medicine and Rehabilitation}, vol. 92, no. 12, pp. 1967 –1973, 2011.
 \bibitem{d.j.a.brenneis}
 D. J. A. Brenneis, "Automatic Levelling of a Prosthetic Wrist", \textit{University of Alberta}, 2019.
 
+\bibitem{o.nelles}
+O. Nelles, "Nonlinear system identification, Classical approaches to neural networks and fuzzy models", \textit{Berlin, Heidelberg: Springer Verlag}, 1 ed., 2010
+
+\bibitem{j.gunther}
+J. Gunther, "Machine intelligence for adaptable closed loop and open loop production engineering systems", \textit{University of Alberta}, 2019.
+
 \bibitem{r.s.sutton}
-R. S. Sutton and A. G. Barto, "Introduction to reinforcement learning", \textit{Cambridge: MIT
-Press}, second edition, 2018.
+R. S. Sutton and A. G. Barto, "Introduction to reinforcement learning", Dissertation, \textit{Technische Universität München}, Munich, Germany, 2018.
 
 \bibitem{m.r.o.a.maximo}
 M. R. O. A. Maximo, C. H. C. Ribeiro and R. J. M. Afonso, "Modeling of a position servo used in robotics applications", \textit{Autonomous Computational Systems Lab (LAB-SCA) and Electronic Engineering Division, Computer Science Division, Aeronautics
@@ -510,6 +704,13 @@ Institute of Technology, Pra¸ca Marechal Eduardo Gomes}, 2017.
 
 \bibitem{robotis}
 "Robotis e-manual", \textit{Robotis}, 2019. [Online]. Available: http://emanual.robotis.com/docs/en/dxl/mx/mx-28/. [Accessed: 16-Jul-2019].
+
+\bibitem{blincdev}
+
+\bibitem{odeint}
+https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.odeint.html
+
+\bibitem{e.reichensdorfer}
 % \bibitem{whatisacodec}
 % "What is a CODEC? And why is it an important component of videoconferencing?", \textit{Jwhornvideoconference.com}, 2018. [Online]. Available: http://www.jwhornvideoconference.com/what-is-a-codec-and-why-is-it-an-important-component-of-videoconferencing. [Accessed: 16- Aug- 2018].
 %

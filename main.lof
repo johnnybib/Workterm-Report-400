@@ -2,6 +2,17 @@
 \contentsline {figure}{\numberline {2}{\ignorespaces Diagram of the automatic levelling wrist bypass protheses \cite {d.j.a.brenneis}.\relax }}{4}{figure.caption.5}% 
 \contentsline {figure}{\numberline {3}{\ignorespaces Coordinate system and angles, $\phi $ and $\theta $. The projections of the IMU gravity vector (GV) can be used to calculate $\phi $ and $\theta $ \cite {d.j.a.brenneis}.\relax }}{5}{figure.caption.6}% 
 \contentsline {figure}{\numberline {4}{\ignorespaces Block diagram of the control loop for one servo.\relax }}{6}{figure.caption.7}% 
-\contentsline {figure}{\numberline {5}{\ignorespaces Block diagram of the training process for the PID neural network using the servo neural network to mimic the actual servo output.\relax }}{10}{figure.caption.8}% 
-\contentsline {figure}{\numberline {6}{\ignorespaces Block diagram of the training process for the servo neural network.\relax }}{11}{figure.caption.9}% 
-\contentsline {figure}{\numberline {7}{\ignorespaces Sample figure\relax }}{15}{figure.caption.12}% 
+\contentsline {figure}{\numberline {5}{\ignorespaces APRBS with a maximum amplitude of 1, 500 step length, and maximum hold time of 100 steps. With and without first order butterworth filter.\relax }}{8}{figure.caption.8}% 
+\contentsline {figure}{\numberline {6}{\ignorespaces Block diagram of the training process for the PID neural network using the servo neural network to mimic the actual servo output.\relax }}{11}{figure.caption.9}% 
+\contentsline {figure}{\numberline {7}{\ignorespaces Block diagram of the training process for the servo neural network.\relax }}{11}{figure.caption.10}% 
+\contentsline {figure}{\numberline {8}{\ignorespaces Block diagram of the training process for the PID neural network using the servo model.\relax }}{14}{figure.caption.12}% 
+\contentsline {figure}{\numberline {9}{\ignorespaces Actual and predicted servo position for APRBS with a maximum amplitude of $\frac {\pi }{2}$ over 2000 time steps, at 5ms per time step.\relax }}{15}{figure.caption.13}% 
+\contentsline {figure}{\numberline {10}{\ignorespaces Neural network prediction vs actual for the step input.\relax }}{16}{figure.caption.14}% 
+\contentsline {figure}{\numberline {11}{\ignorespaces Simulation vs actual for the step input.\relax }}{17}{figure.caption.15}% 
+\contentsline {figure}{\numberline {12}{\ignorespaces Tuned simulation vs actual for a step input.\relax }}{18}{figure.caption.16}% 
+\contentsline {figure}{\numberline {13}{\ignorespaces Structure of the PID neural network.\relax }}{21}{figure.caption.18}% 
+\contentsline {figure}{\numberline {14}{\ignorespaces APRBS used for training.\relax }}{22}{figure.caption.19}% 
+\contentsline {figure}{\numberline {15}{\ignorespaces Rotation servo step response with and without PID Auto-Tuning.\relax }}{23}{figure.caption.21}% 
+\contentsline {figure}{\numberline {16}{\ignorespaces PID gains output by the rotation PID neural network during the step response test.\relax }}{23}{figure.caption.22}% 
+\contentsline {figure}{\numberline {17}{\ignorespaces Flexion servo step response with and without PID Auto-Tuning.\relax }}{24}{figure.caption.23}% 
+\contentsline {figure}{\numberline {18}{\ignorespaces PID gains output by the flexion PID neural network during the step response test.\relax }}{24}{figure.caption.24}% 

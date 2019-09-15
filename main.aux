@@ -61,56 +61,95 @@
 \newlabel{eq:jacobian}{{6}{7}{Levenberg-Marquardt Algorithm}{equation.3.6}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.3}Numerically Calculating the Jacobian of the Servo}{7}{subsubsection.3.2.3}\protected@file@percent }
 \newlabel{sec:numerical_jacobian}{{3.2.3}{7}{Numerically Calculating the Jacobian of the Servo}{subsubsection.3.2.3}{}}
+\citation{o.nelles}
+\citation{j.gunther}
 \newlabel{eq:jacobian_numerical_calc}{{7}{8}{Numerically Calculating the Jacobian of the Servo}{equation.3.7}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Proposed Solutions}{8}{section.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Criteria and Constraints}{8}{subsection.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Amplitude Modulated Pseudo-Random Binary Signal}{8}{subsection.3.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces APRBS with a maximum amplitude of 1, 500 step length, and maximum hold time of 100 steps. With and without first order butterworth filter.\relax }}{8}{figure.caption.8}\protected@file@percent }
+\newlabel{fig:aprbs}{{5}{8}{APRBS with a maximum amplitude of 1, 500 step length, and maximum hold time of 100 steps. With and without first order butterworth filter.\relax }{figure.caption.8}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Proposed Solutions}{9}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Criteria and Constraints}{9}{subsection.4.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Neural Network Methods}{9}{subsection.4.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.1}PID Auto-Tuning, Trained Model-Free using Backpropagation}{9}{subsubsection.4.2.1}\protected@file@percent }
-\newlabel{sec:model_free_backprop}{{4.2.1}{9}{PID Auto-Tuning, Trained Model-Free using Backpropagation}{subsubsection.4.2.1}{}}
-\newlabel{eq:model_free_error}{{8}{9}{PID Auto-Tuning, Trained Model-Free using Backpropagation}{equation.4.8}{}}
-\newlabel{eq:backprop_servo}{{9}{9}{PID Auto-Tuning, Trained Model-Free using Backpropagation}{equation.4.9}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.1}PID Auto-Tuning, Trained Model-Free using Backpropagation}{10}{subsubsection.4.2.1}\protected@file@percent }
+\newlabel{sec:model_free_backprop}{{4.2.1}{10}{PID Auto-Tuning, Trained Model-Free using Backpropagation}{subsubsection.4.2.1}{}}
+\newlabel{eq:model_free_error}{{8}{10}{PID Auto-Tuning, Trained Model-Free using Backpropagation}{equation.4.8}{}}
+\newlabel{eq:backprop_servo}{{9}{10}{PID Auto-Tuning, Trained Model-Free using Backpropagation}{equation.4.9}{}}
 \newlabel{eq:partial_derivs}{{10}{10}{PID Auto-Tuning, Trained Model-Free using Backpropagation}{equation.4.10}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Block diagram of the training process for the PID neural network using the servo neural network to mimic the actual servo output.\relax }}{10}{figure.caption.8}\protected@file@percent }
-\newlabel{fig:pid_model_free_backprop}{{5}{10}{Block diagram of the training process for the PID neural network using the servo neural network to mimic the actual servo output.\relax }{figure.caption.8}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Block diagram of the training process for the PID neural network using the servo neural network to mimic the actual servo output.\relax }}{11}{figure.caption.9}\protected@file@percent }
+\newlabel{fig:pid_model_free_backprop}{{6}{11}{Block diagram of the training process for the PID neural network using the servo neural network to mimic the actual servo output.\relax }{figure.caption.9}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Block diagram of the training process for the servo neural network.\relax }}{11}{figure.caption.10}\protected@file@percent }
+\newlabel{fig:servo_nn_training}{{7}{11}{Block diagram of the training process for the servo neural network.\relax }{figure.caption.10}{}}
 \citation{m.r.o.a.maximo}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Block diagram of the training process for the servo neural network.\relax }}{11}{figure.caption.9}\protected@file@percent }
-\newlabel{fig:servo_nn_training}{{6}{11}{Block diagram of the training process for the servo neural network.\relax }{figure.caption.9}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.2}PID Auto-Tuning, Trained Model-Free using the Levenberg-Marquardt Algorithm}{11}{subsubsection.4.2.2}\protected@file@percent }
-\newlabel{sec:levenberg_model_free}{{4.2.2}{11}{PID Auto-Tuning, Trained Model-Free using the Levenberg-Marquardt Algorithm}{subsubsection.4.2.2}{}}
-\newlabel{eq:levenberg_model_free}{{11}{11}{PID Auto-Tuning, Trained Model-Free using the Levenberg-Marquardt Algorithm}{equation.4.11}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.3}PID Auto-Tuning, Trained with a Model using the Levenberg-Marquardt Algorithm}{11}{subsubsection.4.2.3}\protected@file@percent }
-\newlabel{eq:servo_tf}{{12}{11}{PID Auto-Tuning, Trained with a Model using the Levenberg-Marquardt Algorithm}{equation.4.12}{}}
 \citation{robotis}
-\citation{m.r.o.a.maximo}
-\citation{m.r.o.a.maximo}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.2}PID Auto-Tuning, Trained Model-Free using the Levenberg-Marquardt Algorithm}{12}{subsubsection.4.2.2}\protected@file@percent }
+\newlabel{sec:levenberg_model_free}{{4.2.2}{12}{PID Auto-Tuning, Trained Model-Free using the Levenberg-Marquardt Algorithm}{subsubsection.4.2.2}{}}
+\newlabel{eq:levenberg_model_free}{{11}{12}{PID Auto-Tuning, Trained Model-Free using the Levenberg-Marquardt Algorithm}{equation.4.11}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.3}PID Auto-Tuning, Trained with a Model using the Levenberg-Marquardt Algorithm}{12}{subsubsection.4.2.3}\protected@file@percent }
+\newlabel{eq:servo_tf}{{12}{12}{PID Auto-Tuning, Trained with a Model using the Levenberg-Marquardt Algorithm}{equation.4.12}{}}
 \newlabel{eq:internal_gains_conversion}{{13}{12}{PID Auto-Tuning, Trained with a Model using the Levenberg-Marquardt Algorithm}{equation.4.13}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Parameters for the MX-28AT servo model \cite  {m.r.o.a.maximo}\relax }}{12}{table.caption.10}\protected@file@percent }
-\newlabel{tab:servo_params}{{1}{12}{Parameters for the MX-28AT servo model \cite {m.r.o.a.maximo}\relax }{table.caption.10}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Solution Evaluation}{13}{section.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}PID Auto-Tuning - Trained with Model, using Levenberg-Marquardt}{13}{subsection.5.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}PID Auto-Tuning - Trained Model-Free, using Levenberg-Marquardt}{13}{subsection.5.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}PID Auto-Tuning - Trained Model-Free, using backpropagation}{13}{subsection.5.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Chosen Solution}{13}{subsection.5.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6}PID Auto-Tuning Implementation}{13}{section.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Servo Transfer Function}{14}{subsection.6.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Single DOF Simulation}{14}{subsection.6.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Neural Network Structure}{14}{subsection.6.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.4}Levenberg-Marquardt Algorithm Implementation}{14}{subsection.6.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.5}Amplitude Modulated Pseudo-Random Binary Signal (APRBS) Generation}{14}{subsection.6.5}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Sample table2\relax }}{14}{table.caption.11}\protected@file@percent }
-\newlabel{tab:sampletable}{{2}{14}{Sample table2\relax }{table.caption.11}{}}
-\newlabel{eq:equation}{{14}{14}{Amplitude Modulated Pseudo-Random Binary Signal (APRBS) Generation}{equation.6.14}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Sample figure\relax }}{15}{figure.caption.12}\protected@file@percent }
-\newlabel{fig:figure}{{7}{15}{Sample figure\relax }{figure.caption.12}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {7}Results}{16}{section.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{16}{section.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {9}Recommendations}{16}{section.9}\protected@file@percent }
+\citation{m.r.o.a.maximo}
+\citation{m.r.o.a.maximo}
+\newlabel{eq:inertia}{{14}{13}{PID Auto-Tuning, Trained with a Model using the Levenberg-Marquardt Algorithm}{equation.4.14}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Parameters for the MX-28AT servo model \cite  {m.r.o.a.maximo}\relax }}{13}{table.caption.11}\protected@file@percent }
+\newlabel{tab:servo_params}{{1}{13}{Parameters for the MX-28AT servo model \cite {m.r.o.a.maximo}\relax }{table.caption.11}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Block diagram of the training process for the PID neural network using the servo model.\relax }}{14}{figure.caption.12}\protected@file@percent }
+\newlabel{fig:pid_model_levenberg}{{8}{14}{Block diagram of the training process for the PID neural network using the servo model.\relax }{figure.caption.12}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Solution Evaluation}{14}{section.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Actual and predicted servo position for APRBS with a maximum amplitude of $\frac  {\pi }{2}$ over 2000 time steps, at 5ms per time step.\relax }}{15}{figure.caption.13}\protected@file@percent }
+\newlabel{fig:model_results_1}{{9}{15}{Actual and predicted servo position for APRBS with a maximum amplitude of $\frac {\pi }{2}$ over 2000 time steps, at 5ms per time step.\relax }{figure.caption.13}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces  Neural network prediction vs actual for the step input.\relax }}{16}{figure.caption.14}\protected@file@percent }
+\newlabel{fig:model_results_2}{{10}{16}{Neural network prediction vs actual for the step input.\relax }{figure.caption.14}{}}
+\citation{blincdev}
+\citation{odeint}
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Simulation vs actual for the step input.\relax }}{17}{figure.caption.15}\protected@file@percent }
+\newlabel{fig:simulation_results_1}{{11}{17}{Simulation vs actual for the step input.\relax }{figure.caption.15}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}PID Auto-Tuning Implementation}{17}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Simulation Implementation}{17}{subsection.6.1}\protected@file@percent }
+\newlabel{eq:ode}{{15}{18}{Simulation Implementation}{equation.6.15}{}}
+\newlabel{eq:delays}{{16}{18}{Simulation Implementation}{equation.6.16}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Tuned simulation vs actual for a step input.\relax }}{18}{figure.caption.16}\protected@file@percent }
+\newlabel{fig:paramcombo}{{12}{18}{Tuned simulation vs actual for a step input.\relax }{figure.caption.16}{}}
+\citation{e.reichensdorfer}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Best Parameters for the Simulation\relax }}{19}{table.caption.17}\protected@file@percent }
+\newlabel{tab:bestparams}{{2}{19}{Best Parameters for the Simulation\relax }{table.caption.17}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Servo Simulation\relax }}{19}{algorithm.1}\protected@file@percent }
+\newlabel{alg:simulation}{{1}{19}{Servo Simulation\relax }{algorithm.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}PID Neural Network Training}{19}{subsection.6.2}\protected@file@percent }
+\citation{}
+\citation{j.gunther}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces Servo Simulation\relax }}{20}{algorithm.2}\protected@file@percent }
+\newlabel{alg:training}{{2}{20}{Servo Simulation\relax }{algorithm.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Neural Network Structure}{20}{subsection.6.3}\protected@file@percent }
+\newlabel{eq:normalization}{{17}{20}{Neural Network Structure}{equation.6.17}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces Structure of the PID neural network.\relax }}{21}{figure.caption.18}\protected@file@percent }
+\newlabel{fig:nn_structure}{{13}{21}{Structure of the PID neural network.\relax }{figure.caption.18}{}}
+\newlabel{eq:leakyrelu}{{18}{21}{Neural Network Structure}{equation.6.18}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Results}{21}{section.7}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces APRBS used for training.\relax }}{22}{figure.caption.19}\protected@file@percent }
+\newlabel{fig:aprbs_train}{{14}{22}{APRBS used for training.\relax }{figure.caption.19}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces RMSE Values for Step Responses\relax }}{22}{table.caption.20}\protected@file@percent }
+\newlabel{tab:rmse_results}{{3}{22}{RMSE Values for Step Responses\relax }{table.caption.20}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces Rotation servo step response with and without PID Auto-Tuning.\relax }}{23}{figure.caption.21}\protected@file@percent }
+\newlabel{fig:rotation_results}{{15}{23}{Rotation servo step response with and without PID Auto-Tuning.\relax }{figure.caption.21}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {16}{\ignorespaces PID gains output by the rotation PID neural network during the step response test.\relax }}{23}{figure.caption.22}\protected@file@percent }
+\newlabel{fig:rotation_gains}{{16}{23}{PID gains output by the rotation PID neural network during the step response test.\relax }{figure.caption.22}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {17}{\ignorespaces Flexion servo step response with and without PID Auto-Tuning.\relax }}{24}{figure.caption.23}\protected@file@percent }
+\newlabel{fig:flexion_results}{{17}{24}{Flexion servo step response with and without PID Auto-Tuning.\relax }{figure.caption.23}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {18}{\ignorespaces PID gains output by the flexion PID neural network during the step response test.\relax }}{24}{figure.caption.24}\protected@file@percent }
+\newlabel{fig:flexion_gains}{{18}{24}{PID gains output by the flexion PID neural network during the step response test.\relax }{figure.caption.24}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{25}{section.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {9}Recommendations}{25}{section.9}\protected@file@percent }
 \bibcite{n.m.bajaj}{1}
 \bibcite{s.l.carey}{2}
 \bibcite{k.ostlie}{3}
 \bibcite{d.j.a.brenneis}{4}
-\bibcite{r.s.sutton}{5}
-\bibcite{m.r.o.a.maximo}{6}
-\bibcite{robotis}{7}
-\@writefile{toc}{\contentsline {section}{Appendices}{17}{section*.14}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {A}Appendix}{17}{Appendix.1.A}\protected@file@percent }
+\bibcite{o.nelles}{5}
+\bibcite{j.gunther}{6}
+\bibcite{r.s.sutton}{7}
+\bibcite{m.r.o.a.maximo}{8}
+\bibcite{robotis}{9}
+\bibcite{blincdev}{10}
+\bibcite{odeint}{11}
+\bibcite{e.reichensdorfer}{12}
+\@writefile{toc}{\contentsline {section}{Appendices}{26}{section*.26}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {A}Appendix}{26}{Appendix.1.A}\protected@file@percent }
